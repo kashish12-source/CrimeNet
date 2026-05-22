@@ -1,29 +1,47 @@
-from sqlalchemy.orm import relationship 
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
-from app.database.base import Base
+from sqlalchemy.orm import relationship
+from sqlalchemy import Column,Integer,String,ForeignKey,Date
 from datetime import date
 
+from app.database.base import Base
+
 class Crime(Base):
-    __tablename__="crimes"
-    id=Column(Integer, primary_key=True, index=True)
 
-    title=Column(String,index=True)
+    __tablename__ = "crimes"
 
-    description=Column(String)
+    id = Column(Integer, primary_key=True, index=True)
 
-    crime_type=Column(String)
+    title = Column(String, nullable=False)
 
-    location=Column(String,nullable=False)
+    description = Column(String, nullable=False)
 
-    latitude=Column(String)
+    location = Column(String, nullable=False)
 
-    longitude=Column(String)
+    status = Column(String, default="pending")
 
-    status=Column(String,default="reported")
+    created_at = Column(Date, default=date.today)
 
-    reported_by=Column(Integer, ForeignKey("users.id"))
+    reported_by = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
 
-    created_at=Column(Date,default=date.today())
+    assigned_officer_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True
+    )
 
-    user=relationship("User",back_populates="crimes")
+    reporter = relationship(
+        "User",
+        back_populates="crimes",
+        foreign_keys=[reported_by]
+    )
+    assigned_officer= relationship(
+        "User",
+        foreign_keys=[assigned_officer_id]
+    )
 
+    investigations=relationship(
+        "InvestigationBook",
+        back_populates="crime"
+    )

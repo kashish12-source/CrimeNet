@@ -6,6 +6,8 @@ class UserCreate(BaseModel):
     username:str
     password:str
     role:str
+    address:str
+    phone_number:str
     created_at:date
 
 class UserResponse(BaseModel):

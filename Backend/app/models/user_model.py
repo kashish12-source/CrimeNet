@@ -1,8 +1,8 @@
 from sqlalchemy.orm import relationship
-from datetime import date
+from sqlalchemy import Date
 from sqlalchemy import Column,Integer,String,ForeignKey,DateTime
-
-from database.base import Base
+from datetime import date
+from app.database.base import Base
 
 class User(Base):
     __tablename__="users"
@@ -14,6 +14,12 @@ class User(Base):
     
     password=Column(String,nullable=False)
 
-    role=Column(String,nullable=False)
+    role=Column(String,nullable=False,default="citizen")
 
-    created_at=Column(DateTime,default=date.today,nullable=False)
+    address=Column(String,nullable=False)
+
+    phone_number=Column(String,nullable=False)
+
+    created_at=Column(Date,default=date.today(),nullable=False)
+
+    crimes=relationship("Crime",back_populates="user")

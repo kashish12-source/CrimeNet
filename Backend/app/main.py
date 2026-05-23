@@ -6,7 +6,6 @@ from app.database.base import Base,engine
 from app.models.user_model import User
 from app.models.crime_model import Crime
 from app.models.investigation_notebook_model import InvestigationBook
-from app.models.officer_model import Officer
 
 
 # importing Routes:

@@ -1,0 +1,15 @@
+since when the officer send the notes to the investigation book it needs to be encrypted
+and confidential so for this encryption I used to import pip install cryptography 
+
+
+and create a new file in auth folder which is encryption
+
+while using the cryptography you need to generate the secrete key only for once and then paste 
+that key in secret_encrypt_key 
+and you get this key from pasting 
+from cryptography.fernet import Fernet
+
+print(Fernet.generate_key()) 
+
+ this in the python terminal
+ 

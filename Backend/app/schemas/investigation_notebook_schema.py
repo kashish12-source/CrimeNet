@@ -1,15 +1,19 @@
 from pydantic import BaseModel
 from datetime import date
 
-class InvestigationBook(BaseModel):
-    note:str
+
+# REQUEST SCHEMA
+class InvestigationCreate(BaseModel):
+    note: str
 
 
+# RESPONSE SCHEMA
 class InvestigationResponse(BaseModel):
-    id:int
-    note:str
-    created_at:date
-    crime_id:int
-    officer_id:int
+    id: int
+    note: str
+    created_at: date
+    crime_id: int
+    officer_id: int
+
     class Config:
-        form_attributes=True
+        from_attributes = True

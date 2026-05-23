@@ -29,3 +29,8 @@ class User(Base):
         back_populates="reporter",
         foreign_keys="Crime.reported_by"
     )
+
+    evidence = relationship(
+    "Evidence",
+    back_populates="officer"
+)

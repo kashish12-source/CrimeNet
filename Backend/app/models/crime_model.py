@@ -45,3 +45,9 @@ class Crime(Base):
         "InvestigationBook",
         back_populates="crime"
     )
+
+    evidence = relationship(
+    "Evidence",
+    back_populates="crime",
+    cascade="all, delete"
+)

@@ -1,6 +1,7 @@
 from fastapi import APIRouter,Depends,HTTPException,status 
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from app.utils.logger import activity_logs
 
 from app.database.connection import SessionLocal
 from app.models.user_model import User
@@ -49,6 +50,12 @@ def registerUser(
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    activity_logs(
+        db=db,
+        action="user register successfully",
+        user_id=new_user.id
+        
+    )
     return new_user
 
 

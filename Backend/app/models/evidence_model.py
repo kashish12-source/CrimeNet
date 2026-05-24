@@ -1,27 +1,58 @@
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    ForeignKey
+)
+
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column,Integer , String, ForeignKey, DateTime
-from database.base import Base
-from datetime import date
+
+from app.database.base import Base
+
 
 class Evidence(Base):
-    __tablename__="evidence"
-    id=Column(Integer,primary_key=True,index=True)
 
-    crime_id=Column(Integer,ForeignKey("crimes.id"))
+    __tablename__ = "evidence"
 
-    uploaded_by=Column(Integer,ForeignKey("officer.id"))
-    
-    officer_name=Column(String,ForeignKey("officer.name"))
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
 
-    file_type=Column(String)
-    
-    file_path=Column(String)
+    file_name = Column(
+        String,
+        nullable=False
+    )
 
-    uploaded_at=Column(DateTime,default=date.today)
+    file_path = Column(
+        String,
+        nullable=False
+    )
 
-    description=Column(String,nullable=False)
+    description = Column(
+        String,
+        nullable=False
+    )
 
-    crime=relationship("Crime",back_populates="evidence")
+    crime_id = Column(
+        Integer,
+        ForeignKey("crimes.id")
+    )
 
-    officer=relationship("Officer",back_populates="evidence")
+    uploaded_by = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
 
+    # RELATIONSHIPS
+
+    crime = relationship(
+        "Crime",
+        back_populates="evidence"
+    )
+
+    officer = relationship(
+        "User",
+        back_populates="evidence"
+    )

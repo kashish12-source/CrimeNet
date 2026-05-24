@@ -1,6 +1,7 @@
 from fastapi import HTTPException , Depends, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from app.utils.logger import activity_logs
 
 from app.database.base import get_db
 from app.models.officer_model import Officer
@@ -52,4 +53,10 @@ def update_status( crime_id:int,data:UpdateStatus,current_user:User=Depends(offi
     crime.status=data.status
     db.commit()
     db.refresh(crime)
+    activity_logs(
+        db=db,
+        action="Staus updated successfully",
+        crime_id=crime_id,
+        user_id=current_user.id
+    )
     return crime

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-
+from app.utils.logger import activity_logs
 from app.database.base import get_db
 
 # MODELS
@@ -98,6 +98,13 @@ def add_investigation(
     db.commit()
 
     db.refresh(new_note)
+    # add to activit logs
+    activity_logs(
+        db=db,
+        action="Investigation Note Added",
+        crime_id=crime_id,
+        user_id=officer_id.id
+    )
 
     return new_note
 from app.auth.encryption import decrypt_notes

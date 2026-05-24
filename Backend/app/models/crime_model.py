@@ -51,3 +51,7 @@ class Crime(Base):
     back_populates="crime",
     cascade="all, delete"
 )
+    
+    logs=relationship("Activity_logs",
+                      back_populates="crime")
+                      

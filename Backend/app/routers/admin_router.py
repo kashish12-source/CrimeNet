@@ -12,6 +12,7 @@ from app.schemas.user_schema import  UserCreate,UserResponse
 from app.auth.hashing import hash_password,verify_password
 from app.schemas.crime_schema import CrimeResponse,CrimeCreate,AssignOfficer
 from app.models.crime_model import Crime
+from app.utils.logger import activity_logs
 
 router=APIRouter(
     prefix="/admin",
@@ -62,6 +63,12 @@ def create_officer(
     db.add(new_officer)
     db.commit()
     db.refresh(new_officer)
+    activity_logs(
+        db=db,
+        action="user register successfully",
+        user_id=new_officer.id
+        
+    )
     return new_officer
 
 # admin can see every officer user 
@@ -105,6 +112,12 @@ def assigne_officer(
     crime.status="assigned"
     db.commit()
     db.refresh(crime)
+    activity_logs(
+        db=db,
+        action="user register successfully",
+        user_id=officer.id,
+        crime_id=crime_id
+    )
     return {
         "assignment of officer is successfull"
     }

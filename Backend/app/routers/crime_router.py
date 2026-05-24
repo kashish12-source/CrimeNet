@@ -1,6 +1,7 @@
 from fastapi import HTTPException , Depends, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from app.utils.logger import activity_logs
 
 from app.database.connection import SessionLocal
 from app.models.crime_model import Crime
@@ -36,4 +37,10 @@ def create_crime(crime : CrimeCreate, db:Session=Depends(get_db), current_user:U
         db.add(new_crime)
         db.commit()
         db.refresh(new_crime)
+        activity_logs(
+             db=db,
+             action="Crime is posted succesfully",
+             crime_id=new_crime.id,
+             user_id=current_user.id
+        )
         return new_crime

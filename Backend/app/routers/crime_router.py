@@ -1,6 +1,7 @@
 from fastapi import HTTPException , Depends, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from typing import Optional 
 from app.utils.logger import activity_logs
 
 from app.database.connection import SessionLocal
@@ -44,3 +45,47 @@ def create_crime(crime : CrimeCreate, db:Session=Depends(get_db), current_user:U
              user_id=current_user.id
         )
         return new_crime
+
+@router.get("/all")
+def get_all_crime(
+     status:Optional[str]=None,
+     location:Optional[str]=None,
+     officer_id:Optional[str]=None,
+     page:int=1,
+     limit:int=5,
+     sort:str="latest",
+     db:Session=Depends(get_db),
+     current_user:User=Depends(get_current_user)
+):
+    query=db.query(Crime)
+    if status:
+       query=query.filter(Crime.status==status)
+    if location:
+        query=query.filter(
+            Crime.location.ilike(f"%{location}%")
+        )
+    if officer_id:
+        query=query.filter(Crime.assigned_officer_id==officer_id)
+    if sort=="latest":
+        query=query.order_by(
+            Crime.id.desc()
+        )
+    elif sort == "oldest":
+        query=query.order_by(
+            Crime.id.asc()
+
+        )
+
+# this is for PAGINATION:
+
+    skip=(page-1)*limit
+    crimes=query.offset(skip).limit(limit).all()
+    return{
+        "pages":page,
+        "limit":limit,
+        "total_records":query.count(),
+        "data":crimes
+
+    }
+
+

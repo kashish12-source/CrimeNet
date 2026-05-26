@@ -9,6 +9,7 @@ from app.models.crime_model import Crime
 from app.models.investigation_notebook_model import InvestigationBook
 from app.models.evidence_model import Evidence
 from app.models.activitylogs_model import Activity_logs
+from app.models.notification_model import Notification
 
 
 # importing Routes:
@@ -19,6 +20,9 @@ from app.routers.officer_router import router as officer_router
 from app.routers.investigation_notebook_router import router as investiate_router
 from app.routers.evidence_router import router as evidence_router
 from app.routers.dashboard_router import router as dashboard_router
+from app.routers.timeline_router import router as timeline_router
+
+from app.routers.notification_router import router as notification_router
 
 Base.metadata.create_all(bind=engine)
 app=FastAPI()
@@ -31,3 +35,5 @@ app.include_router(officer_router)
 app.include_router(investiate_router)
 app.include_router(evidence_router)
 app.include_router(dashboard_router)
+app.include_router(timeline_router)
+app.include_router(notification_router)

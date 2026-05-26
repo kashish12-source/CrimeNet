@@ -14,6 +14,7 @@ from app.models.crime_model import Crime
 from app.schemas.crime_schema import UpdateStatus
 
 from app.database.connection import SessionLocal
+from app.models.notification_model import Notification
 
 router=APIRouter(
     prefix="/officers",
@@ -44,19 +45,73 @@ def get_crimes(current_user:User=Depends(officer_required),db:Session=Depends(ge
     return crimes
 
 # fix the status of crime report by the officer
-
 @router.patch("/crime/{crime_id}")
-def update_status( crime_id:int,data:UpdateStatus,current_user:User=Depends(officer_required),db:Session=Depends(get_db),):
-    crime=db.query(Crime).filter(Crime.id==crime_id).first()
+def update_status(
+    crime_id: int,
+    data: UpdateStatus,
+    current_user: User = Depends(officer_required),
+    db: Session = Depends(get_db),
+):
+
+    allowed_status = [
+        "Pending",
+        "Assigned",
+        "Investigating",
+        "Evidence Collected",
+        "Solved",
+        "Closed"
+    ]
+
+    # CHECK STATUS
+    if data.status not in allowed_status:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid crime status"
+        )
+
+    # FIND CRIME
+    crime = db.query(Crime).filter(
+        Crime.id == crime_id
+    ).first()
+
     if not crime:
-        raise HTTPException (status_code=400,detail="the crime ID does not exists")
-    crime.status=data.status
-    db.commit()
-    db.refresh(crime)
+        raise HTTPException(
+            status_code=404,
+            detail="Crime ID does not exist"
+        )
+
+    # CHECK ASSIGNED OFFICER
+    if crime.assigned_officer_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not assigned to this crime"
+        )
+
+    # UPDATE STATUS
+    crime.status = data.status
+
+    # CREATE NOTIFICATION
+    notification = Notification(
+        user_id=crime.reported_by,
+        message=f"Your crime status updated to '{data.status}'"
+    )
+
+    db.add(notification)
+
+    # ACTIVITY LOG
     activity_logs(
         db=db,
-        action="Staus updated successfully",
-        crime_id=crime_id,
+        action=f"Crime status updated to {data.status}",
+        crime_id=crime.id,
         user_id=current_user.id
     )
-    return crime
+
+    db.commit()
+
+    db.refresh(crime)
+
+    return {
+        "message": "Crime status updated successfully",
+        "crime_id": crime.id,
+        "new_status": crime.status
+    }

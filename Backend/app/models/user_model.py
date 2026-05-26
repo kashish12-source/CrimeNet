@@ -34,3 +34,8 @@ class User(Base):
     "Evidence",
     back_populates="officer"
 )
+    notifications=relationship(
+        "Notification",
+        back_populates="user"
+
+    )

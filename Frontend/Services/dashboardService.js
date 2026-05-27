@@ -1,6 +1,6 @@
-import API from "../src/aou/api";
+import API from "../src/api/axios";
 
-export const getDashboardData=async ()=>{
-    const response=await API.get("/dashboard/stats");
+export const getDashboardStats = async () => {
+    const response = await API.get("/dashboard/stats");
     return response.data;
 };

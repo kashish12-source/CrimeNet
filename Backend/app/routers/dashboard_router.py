@@ -73,3 +73,29 @@ def crime_by_status(current_user:User=Depends(admin_only),db:Session=Depends(get
     for status ,count in crime_by_status:
         data[status]=count
     return data
+@router.get("/stats")
+def get_dashboard_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(admin_only)
+):
+
+    total_crimes = db.query(Crime).count()
+
+    solved_cases = db.query(Crime).filter(
+        Crime.status == "solved"
+    ).count()
+
+    pending_cases = db.query(Crime).filter(
+        Crime.status == "pending"
+    ).count()
+
+    officers = db.query(User).filter(
+        User.role == "officer"
+    ).count()
+
+    return {
+        "total_crimes": total_crimes,
+        "solved_cases": solved_cases,
+        "pending_cases": pending_cases,
+        "officers": officers
+    }

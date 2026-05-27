@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import Sidebar from "../components/Sidebar";
+import SideBar from "../components/SideBar";
 import Navbar from "../components/Navbar";
 import DashboardCard from "../components/DashboardCard";
 
-import { getDashboardStats } from "../services/dashboardService";
+import { getDashboardStats } from "../../Services/dashboardService";
 
 function Dashboard() {
 
@@ -40,7 +40,7 @@ function Dashboard() {
         <div className="flex bg-gray-100 min-h-screen">
 
             {/* Sidebar */}
-            <Sidebar />
+            <SideBar />
 
             {/* Main Section */}
             <div className="flex-1">

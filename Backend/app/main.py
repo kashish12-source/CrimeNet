@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.database.base import Base,engine
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 # importing models:
 
@@ -26,6 +27,13 @@ from app.routers.notification_router import router as notification_router
 
 Base.metadata.create_all(bind=engine)
 app=FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.mount("/uploads",StaticFiles(directory="uploads"),name="uploads")
 
 app.include_router(auth_router)

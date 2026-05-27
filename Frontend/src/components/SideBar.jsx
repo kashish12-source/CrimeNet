@@ -15,6 +15,11 @@ function SideBar() {
                 <Link to="/dashboard">
                     Dashboard
                 </Link>
+                <Link to="/report-crime">Report Crime</Link>
+                <Link to="/all-crimes">All Crimes</Link>
+                <Link to="/assigned-crimes">
+                    Assigned Crimes
+                </Link>
 
                 <Link to="/crimes">
                     Crimes

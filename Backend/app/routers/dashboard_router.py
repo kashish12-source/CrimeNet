@@ -76,22 +76,63 @@ def crime_by_status(current_user:User=Depends(admin_only),db:Session=Depends(get
 @router.get("/stats")
 def get_dashboard_stats(
     db: Session = Depends(get_db),
-    current_user: User = Depends(admin_only)
+    current_user: User = Depends(get_current_user)
 ):
 
-    total_crimes = db.query(Crime).count()
+    # ADMIN
+    if current_user.role == "admin":
 
-    solved_cases = db.query(Crime).filter(
-        Crime.status == "solved"
-    ).count()
+        total_crimes = db.query(Crime).count()
 
-    pending_cases = db.query(Crime).filter(
-        Crime.status == "pending"
-    ).count()
+        solved_cases = db.query(Crime).filter(
+            Crime.status == "Solved"
+        ).count()
 
-    officers = db.query(User).filter(
-        User.role == "officer"
-    ).count()
+        pending_cases = db.query(Crime).filter(
+            Crime.status == "Pending"
+        ).count()
+
+        officers = db.query(User).filter(
+            User.role == "officer"
+        ).count()
+
+    # OFFICER
+    elif current_user.role == "officer":
+
+        total_crimes = db.query(Crime).filter(
+            Crime.assigned_officer_id == current_user.id
+        ).count()
+
+        solved_cases = db.query(Crime).filter(
+            Crime.assigned_officer_id == current_user.id,
+            Crime.status == "Solved"
+        ).count()
+
+        pending_cases = db.query(Crime).filter(
+            Crime.assigned_officer_id == current_user.id,
+            Crime.status == "Pending"
+        ).count()
+
+        officers = 1
+
+    # CITIZEN
+    else:
+
+        total_crimes = db.query(Crime).filter(
+            Crime.reported_by == current_user.id
+        ).count()
+
+        solved_cases = db.query(Crime).filter(
+            Crime.reported_by == current_user.id,
+            Crime.status == "Solved"
+        ).count()
+
+        pending_cases = db.query(Crime).filter(
+            Crime.reported_by == current_user.id,
+            Crime.status == "Pending"
+        ).count()
+
+        officers = 0
 
     return {
         "total_crimes": total_crimes,

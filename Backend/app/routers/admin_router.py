@@ -3,121 +3,159 @@ from fastapi import (
     Depends,
     HTTPException
 )
+
 from sqlalchemy.orm import Session
-from app.database.base import get_db
+
+from app.database.connection import SessionLocal
 from app.auth.oauth2 import get_current_user
 from app.models.user_model import User
-from app.database.connection import SessionLocal
-from app.schemas.user_schema import  UserCreate,UserResponse
-from app.auth.hashing import hash_password,verify_password
-from app.schemas.crime_schema import CrimeResponse,CrimeCreate,AssignOfficer
 from app.models.crime_model import Crime
+
+from app.schemas.user_schema import UserCreate
+from app.schemas.crime_schema import AssignOfficer
+
+from app.auth.hashing import hash_password
+
 from app.utils.logger import activity_logs
 
-router=APIRouter(
+router = APIRouter(
     prefix="/admin",
-    tags=['Admin']
-
+    tags=["Admin"]
 )
 
-# database dependency
+# DATABASE
 def get_db():
-    db=SessionLocal()
+    db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
 
-# check authorization of admin user
+
+# ADMIN CHECK
 def admin_required(
-        current_user:User=Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
-    if current_user.role!="admin":
-        raise HTTPException(status_code=403,detail="Admin privileges required")
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin privileges required"
+        )
+
     return current_user
 
-# now admin is able to create a new officer user
+
+# CREATE OFFICER
 @router.post("/officers")
 def create_officer(
-    officer:UserCreate,
-    db:Session=Depends(get_db),
-    admin:User=Depends(admin_required)
+    officer: UserCreate,
+    db: Session = Depends(get_db),
+    admin: User = Depends(admin_required)
 ):
-    # check if the email already exists
-    existing_user=db.query(User).filter(User.email==officer.email).first()
-    if existing_user:
-        raise HTTPException(status_code=400,detail="email already exists")
-    # hash the password
-    hashed_password=hash_password(officer.password)
 
-    # create a new officer user
-    new_officer=User(
+    existing_user = db.query(User).filter(
+        User.email == officer.email
+    ).first()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="Email already exists"
+        )
+
+    hashed_password = hash_password(
+        officer.password
+    )
+
+    new_officer = User(
         username=officer.username,
         email=officer.email,
         password=hashed_password,
-        role=officer.role,
+        role="officer",
         address=officer.address,
         phone_number=officer.phone_number
+    )
 
-    )
     db.add(new_officer)
+
     db.commit()
+
     db.refresh(new_officer)
-    activity_logs(
-        db=db,
-        action="user register successfully",
-        user_id=new_officer.id
-        
-    )
+
     return new_officer
 
-# admin can see every officer user 
+
+# GET ALL OFFICERS
 @router.get("/officers")
 def get_all_officers(
-    db:Session=Depends(get_db),
-    admin:User=Depends(admin_required)
+    db: Session = Depends(get_db),
+    admin: User = Depends(admin_required)
 ):
-    officers=db.query(User).filter(User.role=="officer").all()
-    if not officers:
-        raise HTTPException(status_code=404,detail="no officers found")
+
+    officers = db.query(User).filter(
+        User.role == "officer"
+    ).all()
 
     return officers
 
-# now admin can get all the crimes 
+
+# GET ALL CRIMES
 @router.get("/crimes")
-def get_all_crimes(admin:User=Depends(admin_required),db:Session=Depends(get_db)):
-    crimes=db.query(Crime).all()
-    if not crimes:
-        raise HTTPException (status_code=400,detail="no crime has been registered")
+def get_all_crimes(
+    db: Session = Depends(get_db),
+    admin: User = Depends(admin_required)
+):
+
+    crimes = db.query(Crime).all()
+
     return crimes
 
-@router.post("/assign_officer/{crime_id}")
-def assigne_officer(
-    crime_id:int,
-    data:AssignOfficer,
-    admin:User=Depends(admin_required),
-    db:Session=Depends(get_db)
-):
-    crime=db.query(Crime).filter(Crime.id==crime_id).first()
-    if not crime:
-        raise HTTPException (status_code=400, detail="enter a valid crime id")
-    officer=db.query(User).filter(
-        User.id==data.officer_id,
-        User.role=="officer"
-    ).first()
-    if not officer :
-         raise HTTPException (status_code=400,detail="no crime has been registered")    
-    crime.assigned_officer_id= officer.id
 
-    crime.status="assigned"
-    db.commit()
-    db.refresh(crime)
+# ASSIGN OFFICER
+@router.post("/assign-officer/{crime_id}")
+def assign_officer(
+    crime_id: int,
+    data: AssignOfficer,
+    db: Session = Depends(get_db),
+    admin: User = Depends(admin_required)
+):
+
+    crime = db.query(Crime).filter(
+        Crime.id == crime_id
+    ).first()
+
+    if not crime:
+        raise HTTPException(
+            status_code=404,
+            detail="Crime not found"
+        )
+
+    officer = db.query(User).filter(
+        User.id == data.officer_id,
+        User.role == "officer"
+    ).first()
+
+    if not officer:
+        raise HTTPException(
+            status_code=404,
+            detail="Officer not found"
+        )
+
+    crime.assigned_officer_id = officer.id
+
+    crime.status = "Assigned"
+
     activity_logs(
         db=db,
-        action="user register successfully",
-        user_id=officer.id,
-        crime_id=crime_id
+        action="Officer assigned to crime",
+        user_id=admin.id,
+        crime_id=crime.id
     )
+
+    db.commit()
+
+    db.refresh(crime)
+
     return {
-        "assignment of officer is successfull"
+        "message": "Officer assigned successfully"
     }

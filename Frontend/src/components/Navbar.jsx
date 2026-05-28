@@ -1,4 +1,21 @@
+import { useNavigate } from "react-router-dom";
+
 function Navbar() {
+
+    const navigate = useNavigate();
+
+    const user = JSON.parse(
+        localStorage.getItem("user")
+    );
+
+    const handleLogout = () => {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        navigate("/");
+    };
 
     return (
 
@@ -10,14 +27,23 @@ function Navbar() {
 
             <div className="flex items-center gap-4">
 
-                <p className="font-semibold">
-                    Admin
-                </p>
+                <div className="text-right">
 
-                <button className="bg-black text-white px-4 py-2 rounded-lg">
+                    <p className="font-semibold">
+                        {user?.username}
+                    </p>
 
+                    <p className="text-sm text-gray-500 capitalize">
+                        {user?.role}
+                    </p>
+
+                </div>
+
+                <button
+                    onClick={handleLogout}
+                    className="bg-black text-white px-4 py-2 rounded-lg"
+                >
                     Logout
-
                 </button>
 
             </div>

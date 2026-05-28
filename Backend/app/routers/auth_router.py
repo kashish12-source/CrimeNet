@@ -32,6 +32,8 @@ def registerUser(
 ):
     # check the existig user
     existing_user=db.query(User).filter(User.email==user.email).first()
+    print(user.email)
+    print(existing_user)
     if existing_user:
         raise HTTPException(status_code=400,detail="email already exists")
     # hash the password
@@ -77,7 +79,14 @@ def loginUser(
     if not verify_password(password, user.password):
         raise HTTPException(status_code=400,detail="invalid credentials")   
     access_token=create_access_token(data={"sub":user.email})
-    return{"access_token":access_token,"token_type":"bearer","token":access_token}
+    return{"access_token":access_token,
+           "token_type":"bearer",
+              "user": {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "role": user.role
+    }}
 
 @router.get("/me",response_model=UserResponse)
 def read_users_me(current_user:User=Depends(get_current_user)):

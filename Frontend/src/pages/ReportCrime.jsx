@@ -1,39 +1,60 @@
-import {useState} from "react";
+import { useState } from "react";
 
 import SideBar from "../components/SideBar";
 import Navbar from "../components/Navbar";
 
-import {createcrime } from "../../Services/crimeService";
+import { createCrime } from "../../Services/crimeService";
 
-function ReportCrime()
-{
-    const [formData, setFormData]=useState({
-        title:"",
-        description:"",
-        location:"",
+function ReportCrime() {
+
+    const [formData, setFormData] = useState({
+        title: "",
+        description: "",
+        location: "",
     });
 
-    const handleChange =(e) => {
+    const handleChange = (e) => {
+
         setFormData({
             ...formData,
-             [e.target.name]:e.target.value
+            [e.target.name]: e.target.value
         });
-
     };
-    const handleSubmit =async(e) => {
+
+    const handleSubmit = async (e) => {
+
         e.preventDefault();
-        try{
 
-            await  createcrime(formData);
+        try {
+
+            const response = await createCrime(
+                formData
+            );
+
+            console.log(response);
+
             alert("Crime reported successfully!");
-        }
-        catch (error)
-        {
+
+            setFormData({
+                title: "",
+                description: "",
+                location: "",
+            });
+
+        } catch (error) {
+
             console.log(error);
+
+            alert(
+                error.response?.data?.detail ||
+                "Failed to report crime"
+            );
         }
     };
-    return(
-                <div className="flex bg-gray-100 min-h-screen">
+
+    return (
+
+        <div className="flex bg-gray-100 min-h-screen">
 
             <SideBar />
 
@@ -49,31 +70,61 @@ function ReportCrime()
 
                     <form
                         onSubmit={handleSubmit}
-                        className="bg-white p-6 rounded-xl shadow-md max-w-2xl"
+                        className="
+                            bg-white
+                            p-6
+                            rounded-xl
+                            shadow-md
+                            max-w-2xl
+                        "
                     >
 
                         <input
                             type="text"
                             name="title"
+                            value={formData.title}
                             placeholder="Crime Title"
-                            className="w-full border p-3 rounded-lg mb-4"
+                            className="
+                                w-full
+                                border
+                                p-3
+                                rounded-lg
+                                mb-4
+                            "
                             onChange={handleChange}
+                            required
                         />
 
                         <textarea
                             name="description"
+                            value={formData.description}
                             placeholder="Crime Description"
-                            className="w-full border p-3 rounded-lg mb-4"
+                            className="
+                                w-full
+                                border
+                                p-3
+                                rounded-lg
+                                mb-4
+                            "
                             rows="5"
                             onChange={handleChange}
+                            required
                         />
 
                         <input
                             type="text"
                             name="location"
+                            value={formData.location}
                             placeholder="Location"
-                            className="w-full border p-3 rounded-lg mb-4"
+                            className="
+                                w-full
+                                border
+                                p-3
+                                rounded-lg
+                                mb-4
+                            "
                             onChange={handleChange}
+                            required
                         />
 
                         <button
@@ -86,7 +137,7 @@ function ReportCrime()
                                 rounded-lg
                             "
                         >
-                            Submit
+                            Submit Crime
                         </button>
 
                     </form>
@@ -97,7 +148,6 @@ function ReportCrime()
 
         </div>
     );
-
-    
 }
+
 export default ReportCrime;

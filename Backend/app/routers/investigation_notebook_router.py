@@ -103,7 +103,7 @@ def add_investigation(
         db=db,
         action="Investigation Note Added",
         crime_id=crime_id,
-        user_id=officer_id.id
+        user_id=officer_id
     )
 
     return new_note

@@ -58,22 +58,17 @@ def get_all_crime(
      current_user:User=Depends(get_current_user)
 ):
     query=db.query(Crime)
-    if status:
-       query=query.filter(Crime.status==status)
-    if location:
-        query=query.filter(
-            Crime.location.ilike(f"%{location}%")
-        )
-    if officer_id:
-        query=query.filter(Crime.assigned_officer_id==officer_id)
-    if sort=="latest":
-        query=query.order_by(
-            Crime.id.desc()
-        )
-    elif sort == "oldest":
-        query=query.order_by(
-            Crime.id.asc()
+    if current_user.role == "citizen":
 
+        query = query.filter(
+            Crime.reported_by == current_user.id
+        )
+
+# officer -> assigned crimes only
+    elif current_user.role == "officer":
+
+        query = query.filter(
+            Crime.assigned_officer_id == current_user.id
         )
 
 # this is for PAGINATION:
@@ -113,3 +108,14 @@ def update_crime_status(crime_id: int, data: UpdateStatus, db: Session = Depends
     return {"message": "Crime status updated successfully", "crime": crime}
 
 
+@router.get("/my-crimes")
+def get_my_crimes(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+
+    crimes = db.query(Crime).filter(
+        Crime.reported_by == current_user.id
+    ).all()
+
+    return crimes

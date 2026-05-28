@@ -16,7 +16,7 @@ class Crime(Base):
 
     location = Column(String, nullable=False)
 
-    status = Column(String, default="pending")
+    status = Column(String, default="Pending")
 
     created_at = Column(Date, default=date.today)
 

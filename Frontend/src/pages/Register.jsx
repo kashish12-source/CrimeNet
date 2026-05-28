@@ -1,91 +1,268 @@
+import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import { registerUser as registerService } from "../../Services/authService";
 
-function Register()
-{
-  const [formData , setFormData]=useState({
-    username:"",
-    email:"",
-    password:"",
-    role:"",
-    address:"",
-    phone_number:"",
+function Register() {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        username: "",
+        email: "",
+        password: "",
+        role: "",
+        address: "",
+        phone_number: "",
+        created_at: ""
+    });
 
-  });
-
-  const registerUser = async (e) => {
-    e.preventDefault();
-    try{
-      await registerService(formData);
-      alert("Registration successful! Please login.");
-
-    }
-    catch(error)
-    {
-      console.log(error);
-
-    }
-  };
-  return (
-    <form onSubmit= {registerUser}>
-      <input 
-      type="text"
-      placeholder="Username"
-      onChange={(e)=>
+    const handleChange = (e) => {
         setFormData({
-          ...formData,username:e.target.value
-        })
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
 
-      }/>
-      <input 
-      type="email"
-      placeholder="Email"
-      onChange={(e)=>
-        setFormData({
-          ...formData,email:e.target.value
-        })
+    const registerUser = async (e) => {
 
-      }/>
-      <input 
-      type="password"
-      placeholder="Password"
-      onChange={(e)=>
-        setFormData({
-          ...formData,password:e.target.value
-        })
+        e.preventDefault();
 
-      }/>
-      <input 
-      type="text"
-      placeholder="Role"
-      onChange={(e)=>
-        setFormData({
-          ...formData,role:e.target.value
-        })
+        try {
 
-      }/>
-      <input 
-      type="text"
-      placeholder="Address"
-      onChange={(e)=>
-        setFormData({
-          ...formData,address:e.target.value
-        })
+            console.log(formData);
 
-      }/>
-      <input 
-      type="text"
-      placeholder="Phone Number"
-      onChange={(e)=>
-        setFormData({
-          ...formData,phone_number:e.target.value
-        })
+            await registerService(formData);
 
-      }/>
-      <button type= "submit">Register</button>
+            alert("Registration successful! Please login.");
+            navigate("/");
 
-    </form>
-  );
+        } catch (error) {
+
+            console.log(error);
+
+            alert(
+                error.response?.data?.detail ||
+                "Registration failed"
+            );
+        }
+    };
+
+    return (
+
+        <div className="
+            min-h-screen
+            bg-gray-100
+            flex
+            items-center
+            justify-center
+            px-4
+        ">
+
+            <div className="
+                bg-white
+                w-full
+                max-w-lg
+                p-8
+                rounded-2xl
+                shadow-xl
+            ">
+
+                <h1 className="
+                    text-3xl
+                    font-bold
+                    text-center
+                    mb-2
+                ">
+                    Create Account
+                </h1>
+
+                <p className="
+                    text-gray-500
+                    text-center
+                    mb-8
+                ">
+                    Register to continue
+                </p>
+
+                <form
+                    onSubmit={registerUser}
+                    className="space-y-5"
+                >
+
+                    <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        placeholder="Enter Username"
+                        autoComplete="username"
+                        className="
+                            w-full
+                            border
+                            border-gray-300
+                            p-3
+                            rounded-lg
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-black
+                        "
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        placeholder="Enter Email"
+                        autoComplete="email"
+                        className="
+                            w-full
+                            border
+                            border-gray-300
+                            p-3
+                            rounded-lg
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-black
+                        "
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        placeholder="Enter Password"
+                        autoComplete="new-password"
+                        className="
+                            w-full
+                            border
+                            border-gray-300
+                            p-3
+                            rounded-lg
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-black
+                        "
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <select
+                        name="role"
+                        value={formData.role}
+                        className="
+                            w-full
+                            border
+                            border-gray-300
+                            p-3
+                            rounded-lg
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-black
+                        "
+                        onChange={handleChange}
+                        required
+                    >
+
+                        <option value="">
+                            Select Role
+                        </option>
+
+                        <option value="citizen">
+                            Citizen
+                        </option>
+
+                        <option value="officer">
+                            Officer
+                        </option>
+
+                        <option value="admin">
+                            Admin
+                        </option>
+
+                    </select>
+
+                    <input
+                        type="text"
+                        name="address"
+                        value={formData.address}
+                        placeholder="Enter Address"
+                        autoComplete="street-address"
+                        className="
+                            w-full
+                            border
+                            border-gray-300
+                            p-3
+                            rounded-lg
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-black
+                        "
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <input
+                        type="text"
+                        name="phone_number"
+                        value={formData.phone_number}
+                        placeholder="Enter Phone Number"
+                        autoComplete="tel"
+                        className="
+                            w-full
+                            border
+                            border-gray-300
+                            p-3
+                            rounded-lg
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-black
+                        "
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <button
+                        type="submit"
+                        className="
+                            w-full
+                            bg-black
+                            text-white
+                            p-3
+                            rounded-lg
+                            hover:bg-gray-800
+                            transition
+                            duration-300
+                            font-semibold
+                        "
+                    >
+                        Register
+                    </button>
+
+                    <p className="
+                        text-center
+                        text-gray-600
+                    ">
+                        Already have an account?{" "}
+
+                        <Link
+                            to="/"
+                            className="
+                                text-black
+                                font-semibold
+                                hover:underline
+                            "
+                        >
+                            Login
+                        </Link>
+                    </p>
+
+                </form>
+
+            </div>
+
+        </div>
+    );
 }
 
 export default Register;

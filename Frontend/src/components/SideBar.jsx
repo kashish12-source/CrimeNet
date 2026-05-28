@@ -2,9 +2,13 @@ import { Link } from "react-router-dom";
 
 function SideBar() {
 
+    const user = JSON.parse(
+        localStorage.getItem("user")
+    );
+
     return (
 
-        <div className="w-64 bg-black text-white p-5">
+        <div className="w-64 bg-black text-white p-5 min-h-screen">
 
             <h1 className="text-2xl font-bold mb-10">
                 CrimeNet
@@ -15,27 +19,52 @@ function SideBar() {
                 <Link to="/dashboard">
                     Dashboard
                 </Link>
-                <Link to="/report-crime">Report Crime</Link>
-                <Link to="/all-crimes">All Crimes</Link>
-                <Link to="/assigned-crimes">
-                    Assigned Crimes
-                </Link>
 
-                <Link to="/crimes">
-                    Crimes
-                </Link>
+                {/* CITIZEN */}
+                {user?.role === "citizen" && (
+                    <>
+                        <Link to="/report-crime">
+                            Report Crime
+                        </Link>
 
-                <Link to="/officers">
-                    Officers
-                </Link>
+                        <Link to="/all-crimes">
+                            My Crimes
+                        </Link>
+                    </>
+                )}
 
-                <Link to="/evidence">
-                    Evidence
-                </Link>
+                {/* OFFICER */}
+                {user?.role === "officer" && (
+                    <>
+                        <Link to="/assigned-crimes">
+                            Assigned Crimes
+                        </Link>
 
-                <Link to="/notifications">
-                    Notifications
-                </Link>
+                        <Link to="/all-crimes">
+                            Crime Records
+                        </Link>
+                    </>
+                )}
+
+                {/* ADMIN */}
+                {user?.role === "admin" && (
+                    <>
+                        <Link to="/all-crimes">
+                            All Crimes
+                        </Link>
+
+                        <Link to="/officers">
+                            Officers
+                        </Link>
+
+                        <Link to="/notifications">
+                            Notifications
+                        </Link>
+                        <Link to="/assign-crime">
+    Assign Crime
+</Link>
+                    </>
+                )}
 
             </div>
 

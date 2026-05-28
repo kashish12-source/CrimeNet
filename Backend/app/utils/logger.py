@@ -4,8 +4,8 @@ from app.models.activitylogs_model import Activity_logs
 def activity_logs(
     db:Session,
     action:str,
-    crime_id:int,
-    user_id:int
+    crime_id:int=None,
+    user_id:int=None
 ):
     log=Activity_logs(
         action=action,

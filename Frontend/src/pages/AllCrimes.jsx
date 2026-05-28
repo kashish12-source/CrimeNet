@@ -11,9 +11,7 @@ function AllCrimes() {
     const [crimes, setCrimes] = useState([]);
 
     useEffect(() => {
-
         fetchCrimes();
-
     }, []);
 
     const fetchCrimes = async () => {
@@ -22,7 +20,7 @@ function AllCrimes() {
 
             const response = await getAllCrimes();
 
-            setCrimes(response.data || response);
+            setCrimes(response.data);
 
         } catch (error) {
 
@@ -46,23 +44,34 @@ function AllCrimes() {
                         All Crimes
                     </h1>
 
-                    <div className="
-                        grid
-                        grid-cols-1
-                        md:grid-cols-2
-                        lg:grid-cols-3
-                        gap-6
-                    ">
+                    {
+                        crimes.length === 0 ? (
 
-                        {crimes.map((crime) => (
+                            <p>No crimes found</p>
 
-                            <CrimeCard
-                                key={crime.id}
-                                crime={crime}
-                            />
-                        ))}
+                        ) : (
 
-                    </div>
+                            <div className="
+                                grid
+                                grid-cols-1
+                                md:grid-cols-2
+                                lg:grid-cols-3
+                                gap-6
+                            ">
+
+                                {crimes.map((crime) => (
+
+                                    <CrimeCard
+                                        key={crime.id}
+                                        crime={crime}
+                                    />
+
+                                ))}
+
+                            </div>
+
+                        )
+                    }
 
                 </div>
 

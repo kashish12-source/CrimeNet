@@ -4,12 +4,11 @@ const API = axios.create({
     baseURL: "http://127.0.0.1:8000",
 });
 
+// ADD TOKEN AUTOMATICALLY
 API.interceptors.request.use(
-
     (config) => {
 
-        const token =
-            localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
         if (token) {
 
@@ -21,7 +20,6 @@ API.interceptors.request.use(
     },
 
     (error) => {
-
         return Promise.reject(error);
     }
 );

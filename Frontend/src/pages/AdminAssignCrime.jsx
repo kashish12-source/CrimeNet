@@ -62,7 +62,7 @@ function AdminAssignCrime() {
         try {
 
             await API.post(
-                `/admin/assign_officer/${crimeId}`,
+                `/admin/assign-officer/${crimeId}`,
                 {
                     officer_id:
                         selectedOfficer[crimeId]

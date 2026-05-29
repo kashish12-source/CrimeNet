@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.database.base import Base,SessionLocal
 from app.database.connection import get_db
 from sqlalchemy import func
 
@@ -35,7 +34,7 @@ def get_total_crimes(
                 }
 @router.get("/solved_crimes")
 def get_solved_crimes(db:Session=Depends(get_db),current_user:User=Depends(admin_only)):
-    solved=db.query(Crime).filter(Crime.status=="solved").count()
+    solved=db.query(Crime).filter(Crime.status=="Solved").count()
     return{
         "solved crimes are ": solved
 
@@ -44,7 +43,7 @@ def get_solved_crimes(db:Session=Depends(get_db),current_user:User=Depends(admin
 # getting pending crimes:
 @router.get("/pending_crimes")
 def get_pending_crimes(db:Session=Depends(get_db),current_user:User=Depends(admin_only)):
-    pending=db.query(Crime).filter(Crime.status=="pending").count()
+    pending=db.query(Crime).filter(Crime.status=="Pending").count()
     return {
         "pending crimes are ": pending
     }

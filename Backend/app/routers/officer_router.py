@@ -40,8 +40,6 @@ def officer_required(
 @router.get("/crimes")
 def get_crimes(current_user:User=Depends(officer_required),db:Session=Depends(get_db)):
     crimes=db.query(Crime).filter(Crime.assigned_officer_id==current_user.id).all()
-    if not crimes:
-         raise HTTPException(status_code=400,detail="only officers are required")
     return crimes
 
 # fix the status of crime report by the officer

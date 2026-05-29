@@ -20,7 +20,7 @@ function AllCrimes() {
 
             const response = await getAllCrimes();
 
-            setCrimes(response.data);
+            setCrimes(response.data || []);
 
         } catch (error) {
 

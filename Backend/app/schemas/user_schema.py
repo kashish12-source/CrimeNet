@@ -2,6 +2,9 @@ from pydantic import BaseModel , EmailStr
 from typing import Optional
 from datetime import date
 
+class UserLogin(BaseModel):
+    email:EmailStr
+    password:str
 class UserCreate(BaseModel):
     email:EmailStr
     username:str

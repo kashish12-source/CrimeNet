@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.database.base import get_db
+from app.database.connection import get_db
 
 from app.models.notification_model import Notification
 from app.models.user_model import User

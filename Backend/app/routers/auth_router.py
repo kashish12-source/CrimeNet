@@ -60,33 +60,44 @@ def registerUser(
     )
     return new_user
 
-
+from app.schemas.user_schema import UserLogin
 # login user:
 @router.post("/login")
 def loginUser(
-    user_data: dict,
-    db:Session=Depends(get_db)
+    user: UserLogin,
+    db: Session = Depends(get_db)
 ):
-    email = user_data.get("email")
-    password = user_data.get("password")
-    
-    if not email or not password:
-        raise HTTPException(status_code=400, detail="Email and password are required")
-    
-    user=db.query(User).filter(User.email==email).first()
-    if not user:
-        raise HTTPException(status_code=400,detail="invalid credentials")
-    if not verify_password(password, user.password):
-        raise HTTPException(status_code=400,detail="invalid credentials")   
-    access_token=create_access_token(data={"sub":user.email})
-    return{"access_token":access_token,
-           "token_type":"bearer",
-              "user": {
-        "id": user.id,
-        "username": user.username,
-        "email": user.email,
-        "role": user.role
-    }}
+    email = user.email
+    password = user.password
+
+    db_user = db.query(User).filter(User.email == email).first()
+
+    if not db_user:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid credentials"
+        )
+
+    if not verify_password(password, db_user.password):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid credentials"
+        )
+
+    access_token = create_access_token(
+        data={"sub": db_user.email}
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": db_user.id,
+            "username": db_user.username,
+            "email": db_user.email,
+            "role": db_user.role
+        }
+    }
 
 @router.get("/me",response_model=UserResponse)
 def read_users_me(current_user:User=Depends(get_current_user)):

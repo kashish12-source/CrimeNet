@@ -52,7 +52,8 @@ function Login() {
             flex
             justify-center
             items-center
-            bg-gray-100
+            bg-slate-100
+            dark:bg-slate-800
             px-4
         ">
 
@@ -60,12 +61,14 @@ function Login() {
                 onSubmit={loginUser}
                 className="
                     bg-white
+                    dark:bg-slate-700
                     p-10
                     rounded-2xl
                     shadow-lg
                     w-full
                     max-w-md
                 "
+            
             >
 
                 <h1 className="
@@ -73,12 +76,15 @@ function Login() {
                     font-bold
                     text-center
                     mb-2
+                    text-slate-900
+                    dark:text-slate-100
                 ">
                     Welcome Back
                 </h1>
 
                 <p className="
-                    text-gray-500
+                    text-slate-500
+                    dark:text-slate-300
                     text-center
                     mb-8
                 ">
@@ -97,6 +103,9 @@ function Login() {
                             w-full
                             border
                             border-gray-300
+                            bg-white
+                            dark:bg-slate-900
+                            dark:text-slate-100
                             p-3
                             rounded-lg
                             focus:outline-none
@@ -122,6 +131,9 @@ function Login() {
                             w-full
                             border
                             border-gray-300
+                            bg-white
+                            dark:bg-slate-900
+                            dark:text-slate-100
                             p-3
                             rounded-lg
                             focus:outline-none
@@ -137,11 +149,11 @@ function Login() {
                     type="submit"
                     className="
                         w-full
-                        bg-black
+                        bg-slate-900
                         text-white
                         py-3
                         rounded-lg
-                        hover:bg-gray-800
+                        hover:bg-slate-800
                         transition
                         font-semibold
                     "
@@ -151,7 +163,8 @@ function Login() {
 
                 <p className="
                     text-center
-                    text-gray-600
+                    text-slate-600
+                    dark:text-slate-300
                     mt-5
                 ">
                     Don’t have an account?{" "}
@@ -159,7 +172,8 @@ function Login() {
                     <Link
                         to="/register"
                         className="
-                            text-black
+                            text-slate-900
+                            dark:text-slate-100
                             font-semibold
                             hover:underline
                         "

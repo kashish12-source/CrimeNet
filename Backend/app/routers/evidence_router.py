@@ -24,7 +24,12 @@ router=APIRouter(
     prefix='/evidence',
     tags=["Evidences"]
 )
-
+allowed=[
+    "jpg",
+    "jpeg",
+    "png",
+    "pdf"
+]
 @router.post("/uploads/{crime_id}")
 def post_evidence(crime_id:int ,
                 current_user:User=Depends(get_current_user),

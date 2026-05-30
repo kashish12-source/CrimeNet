@@ -129,7 +129,11 @@ def assign_officer(
             status_code=404,
             detail="Crime not found"
         )
-
+    if not crime.assigned_officer_id is not None:
+        raise HTTPException(
+            status_code=400,
+            detail="Officer already assigned to this crime"
+        )
     officer = db.query(User).filter(
         User.id == data.officer_id,
         User.role == "officer"

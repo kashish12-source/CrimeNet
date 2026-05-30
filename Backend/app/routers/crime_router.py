@@ -38,14 +38,12 @@ def get_db():
 # CREATE CRIME
 
 # =========================================
-
 @router.post("/crime")
 def create_crime(
-crime: CrimeCreate,
-db: Session = Depends(get_db),
-current_user: User = Depends(get_current_user)
+    crime: CrimeCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-
 
     if current_user.role != "citizen":
         raise HTTPException(
@@ -53,19 +51,39 @@ current_user: User = Depends(get_current_user)
             detail="Only citizens can report crime"
         )
 
+    # Validate input
+    if not crime.title or not crime.title.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Title cannot be empty"
+        )
+
+    if not crime.description or not crime.description.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Description cannot be empty"
+        )
+
+    if not crime.location or not crime.location.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Location cannot be empty"
+        )
+
+    # Create crime
     new_crime = Crime(
-        title=crime.title,
-        description=crime.description,
-        location=crime.location,
+        title=crime.title.strip(),
+        description=crime.description.strip(),
+        location=crime.location.strip(),
         reported_by=current_user.id
     )
 
     db.add(new_crime)
 
-    db.commit()
+    # Generate ID without committing
+    db.flush()
 
-    db.refresh(new_crime)
-
+    # Create activity log
     activity_logs(
         db=db,
         action="Crime posted successfully",
@@ -73,13 +91,12 @@ current_user: User = Depends(get_current_user)
         user_id=current_user.id
     )
 
-    # SEND NOTIFICATION TO ALL OFFICERS
+    # Send notifications to all officers
     officers = db.query(User).filter(
         User.role == "officer"
     ).all()
 
     for officer in officers:
-
         notification = Notification(
             message=f"New crime reported: {new_crime.title}",
             user_id=officer.id
@@ -87,10 +104,12 @@ current_user: User = Depends(get_current_user)
 
         db.add(notification)
 
+    # Save everything together
     db.commit()
 
-    return new_crime
+    db.refresh(new_crime)
 
+    return new_crime
 @router.put("/assign/{crime_id}")
 def assign_officer(
     crime_id: int,

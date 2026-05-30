@@ -84,7 +84,11 @@ def add_investigation(
             status_code=400,
             detail="Crime not assigned to this officer"
         )
-
+    if not notes.note or not notes.note.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Note cannot be empty"
+        )
     # CREATE NOTE
     new_note = InvestigationBook(
         note=encrypt_notes(notes.note),

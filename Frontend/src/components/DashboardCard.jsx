@@ -4,6 +4,8 @@ function DashboardCard({ title, value }) {
 
         <div className="
             bg-white
+            dark:bg-slate-700
+            dark:text-slate-100
             p-6
             rounded-2xl
             shadow-md
@@ -12,7 +14,8 @@ function DashboardCard({ title, value }) {
         ">
 
             <h2 className="
-                text-gray-500
+                text-slate-500
+                dark:text-slate-300
                 text-lg
                 font-medium
             ">

@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from sqlalchemy import func
-
+from app.models.investigation_notebook_model import InvestigationBook
+from app.models.activitylogs_model import Activity_logs
 # importing modesl
 from app.models.crime_model import Crime
 from app.models.user_model import User
@@ -138,4 +139,141 @@ def get_dashboard_stats(
         "solved_cases": solved_cases,
         "pending_cases": pending_cases,
         "officers": officers
+    }
+@router.get("/status-chart")
+def status_chart(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    data = db.query(
+        Crime.status,
+        func.count(Crime.id)
+    ).group_by(Crime.status).all()
+
+    return [
+        {
+            "name": status,
+            "value": count
+        }
+        for status, count in data
+    ]
+@router.get("/officer-workload")
+def officer_workload(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    officers = db.query(User).filter(
+        User.role == "officer"
+    ).all()
+
+    result = []
+
+    for officer in officers:
+
+        total = db.query(Crime).filter(
+            Crime.assigned_officer_id == officer.id
+        ).count()
+
+        result.append({
+            "officer": officer.username,
+            "cases": total
+        })
+
+    return result
+from app.models.investigation_notebook_model import InvestigationBook
+
+@router.get("/investigation-progress")
+def investigation_progress(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    crimes = db.query(Crime).all()
+
+    result = []
+
+    for crime in crimes:
+
+        notes = db.query(
+            InvestigationBook
+        ).filter(
+            InvestigationBook.crime_id == crime.id
+        ).count()
+
+        result.append({
+            "crime": f"Crime {crime.id}",
+            "notes": notes
+        })
+
+    return result
+@router.get("/location-chart")
+def location_chart(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    data = db.query(
+        Crime.location,
+        func.count(Crime.id)
+    ).group_by(
+        Crime.location
+    ).all()
+
+    return [
+        {
+            "location": location,
+            "count": count
+        }
+        for location, count in data
+    ]
+@router.get("/chart-data")
+def get_chart_data(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    
+    solved = db.query(Crime).filter(
+        Crime.status == "Solved"
+    ).count()
+
+    pending = db.query(Crime).filter(
+        Crime.status == "Pending"
+    ).count()
+
+    investigating = db.query(Crime).filter(
+        Crime.status == "Investigating"
+    ).count()
+
+    total_notes = db.query(
+        InvestigationBook
+    ).count()
+
+    total_logs = db.query(
+        Activity_logs
+    ).count()
+
+    return {
+        "crime_status": [
+            {
+                "name":"Solved",
+                "value": solved
+            },
+            {
+                "name":"Pending",
+                "value": pending
+            },
+            {
+                "name":"Investigating",
+                "value": investigating
+            }
+        ],
+
+        "investigation_progress":[
+            {
+                "name":"Investigation Notes",
+                "count": total_notes
+            },
+            {
+                "name":"Activity Logs",
+                "count": total_logs
+            }
+        ]
     }

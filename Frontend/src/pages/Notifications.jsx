@@ -33,7 +33,7 @@ function Notifications() {
 
     return (
 
-        <div className="flex bg-gray-100 min-h-screen">
+        <div className="flex bg-slate-100 dark:bg-slate-900 min-h-screen">
 
             <SideBar />
 
@@ -43,32 +43,47 @@ function Notifications() {
 
                 <div className="p-6">
 
-                    <h1 className="text-3xl font-bold mb-6">
+                    <h1 className="text-3xl font-bold mb-6 text-slate-900 dark:text-slate-100">
                         Notifications
                     </h1>
 
                     <div className="space-y-4">
 
                         {
-                            notifications.map((item) => (
+                            notifications.length > 0 ? (
+                                notifications.map((item) => (
 
-                                <div
-                                    key={item.id}
-                                    className="
-                                        bg-white
-                                        p-5
-                                        rounded-xl
-                                        shadow-md
-                                    "
-                                >
+                                    <div
+                                        key={item.id}
+                                        className="
+                                            bg-white
+                                            dark:bg-slate-700
+                                            dark:text-slate-100
+                                            p-5
+                                            rounded-xl
+                                            shadow-md
+                                        "
+                                    >
 
-                                    <p>
-                                        {item.message}
-                                    </p>
+                                        <p>
+                                            {item.message}
+                                        </p>
 
+                                    </div>
+
+                                ))
+                            ) : (
+                                <div className="
+                                    bg-white
+                                    dark:bg-slate-700
+                                    dark:text-slate-100
+                                    p-5
+                                    rounded-xl
+                                    shadow-md
+                                ">
+                                    <p>No notifications available.</p>
                                 </div>
-
-                            ))
+                            )
                         }
 
                     </div>

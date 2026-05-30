@@ -8,7 +8,7 @@ function SideBar() {
 
     return (
 
-        <div className="w-64 bg-black text-white p-5 min-h-screen">
+        <div className="w-64 bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100 p-5 min-h-screen">
 
             <h1 className="text-2xl font-bold mb-10">
                 CrimeNet
@@ -16,18 +16,27 @@ function SideBar() {
 
             <div className="flex flex-col gap-5">
 
-                <Link to="/dashboard">
+                <Link
+                    to="/dashboard"
+                    className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                >
                     Dashboard
                 </Link>
 
                 {/* CITIZEN */}
                 {user?.role === "citizen" && (
                     <>
-                        <Link to="/report-crime">
+                        <Link
+                            to="/report-crime"
+                            className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
                             Report Crime
                         </Link>
 
-                        <Link to="/all-crimes">
+                        <Link
+                            to="/all-crimes"
+                            className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
                             My Crimes
                         </Link>
                     </>
@@ -36,11 +45,17 @@ function SideBar() {
                 {/* OFFICER */}
                 {user?.role === "officer" && (
                     <>
-                        <Link to="/assigned-crimes">
+                        <Link
+                            to="/assigned-crimes"
+                            className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
                             Assigned Crimes
                         </Link>
 
-                        <Link to="/all-crimes">
+                        <Link
+                            to="/all-crimes"
+                            className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
                             Crime Records
                         </Link>
                     </>
@@ -49,20 +64,32 @@ function SideBar() {
                 {/* ADMIN */}
                 {user?.role === "admin" && (
                     <>
-                        <Link to="/all-crimes">
+                        <Link
+                            to="/all-crimes"
+                            className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
                             All Crimes
                         </Link>
 
-                        <Link to="/officers">
+                        <Link
+                            to="/officers"
+                            className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
                             Officers
                         </Link>
 
-                        <Link to="/notifications">
+                        <Link
+                            to="/notifications"
+                            className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
                             Notifications
                         </Link>
-                        <Link to="/assign-crime">
-    Assign Crime
-</Link>
+                        <Link
+                            to="/assign-crime"
+                            className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
+                            Assign Crime
+                        </Link>
                     </>
                 )}
 

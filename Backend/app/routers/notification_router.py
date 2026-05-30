@@ -1,10 +1,12 @@
+from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
-
 from app.models.notification_model import Notification
 from app.models.user_model import User
+from app.schemas.notification_schema import Notification as NotificationSchema
 
 from app.auth.oauth2 import get_current_user
 
@@ -15,7 +17,7 @@ router = APIRouter(
 
 
 # GET USER NOTIFICATIONS
-@router.get("/")
+@router.get("/", response_model=List[NotificationSchema])
 def get_notifications(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)

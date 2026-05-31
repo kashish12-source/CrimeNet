@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import SideBar from "../components/SideBar";
 import Navbar from "../components/Navbar";
 import DashboardCard from "../components/DashboardCard";
 import DashboardChart from "../components/DashboardChart";
+
 
 
 
@@ -27,6 +29,7 @@ function Dashboard() {
         pending_cases: 0,
         officers: 0,
     });
+    const navigate = useNavigate();
     const [chartData,setChartData] = useState({
     crime_status:[],
     investigation_progress:[]
@@ -107,25 +110,18 @@ const fetchChartData = async () => {
     console.log(err);
   }
 };
-const handleSearch = async () => {
-
-    if (!search.trim()) {
-        setSearchResults([]);
-        return;
-    }
+const handleSearch = async (query = search) => {
 
     try {
 
-        const data = await searchCrimes(search);
+        const data = await searchCrimes(query);
 
         setSearchResults(data);
 
     }
-    catch (error) {
+    catch(error) {
 
         console.log(error);
-
-        alert("Search failed");
     }
 };
 
@@ -162,7 +158,21 @@ const handleSearch = async () => {
     <input
         type="text"
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+
+    const value = e.target.value;
+
+    setSearch(value);
+
+    if(value.trim()) {
+
+        handleSearch(value);
+
+    } else {
+
+        setSearchResults([]);
+    }
+}}
         placeholder="Search Crimes..."
         className="
             flex-1
@@ -220,47 +230,56 @@ const handleSearch = async () => {
             <div className="space-y-4">
 
                 {
-                    searchResults.map((crime) => (
+    searchResults.map((crime) => (
 
-                        <div
-                            key={crime.id}
-                            className="
-                                border-b
-                                pb-3
-                            "
-                        >
+        <div
+            key={crime.id}
+            onClick={() =>
+                navigate(`/crime/${crime.id}`)
+            }
+            className="
+                border-b
+                pb-3
+                cursor-pointer
+                hover:bg-slate-100
+                dark:hover:bg-slate-600
+                p-2
+                rounded-lg
+                transition
+            "
+        >
 
-                            <p
-                                className="
-                                    font-semibold
-                                    dark:text-white
-                                "
-                            >
-                                {crime.title}
-                            </p>
+            <p
+                className="
+                    font-semibold
+                    dark:text-white
+                "
+            >
+                {crime.title}
+            </p>
 
-                            <p
-                                className="
-                                    text-sm
-                                    text-slate-500
-                                "
-                            >
-                                {crime.location}
-                            </p>
+            <p
+                className="
+                    text-sm
+                    text-slate-500
+                "
+            >
+                {crime.location}
+            </p>
 
-                            <p
-                                className="
-                                    text-xs
-                                    text-slate-400
-                                "
-                            >
-                                {crime.status}
-                            </p>
+            <p
+                className="
+                    text-xs
+                    text-slate-400
+                "
+            >
+                {crime.status}
+            </p>
 
-                        </div>
+        </div>
 
-                    ))
-                }
+    ))
+}
 
             </div>
 

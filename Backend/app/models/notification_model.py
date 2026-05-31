@@ -1,21 +1,21 @@
-from sqlalchemy import Column,Integer,String,ForeignKey,Date,Boolean
-from sqlalchemy.orm import relationship
-from datetime import date
-
-from app.database.base import Base
-
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from datetime import datetime
+from app.database.connection import Base
 class Notification(Base):
-    __tablename__="notifications"
-    id=Column(Integer,primary_key=True ,index=True)
 
-    message= Column(String ,nullable=False)
+    __tablename__ = "notifications"
 
-    is_read=Column(Boolean,default=False)
+    id = Column(Integer, primary_key=True)
 
-    created_at=Column(Date,default=date.today)
+    user_id = Column(Integer)
 
-    # user who recives notification:
-    user_id=Column(Integer,ForeignKey("users.id"))
+    message = Column(String)
 
-    # relationship:
-    user=relationship( "User",back_populates="notifications")
+    link = Column(String)
+
+    is_read = Column(Boolean, default=False)
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )

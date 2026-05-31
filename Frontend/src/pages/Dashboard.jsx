@@ -34,7 +34,7 @@ function Dashboard() {
     const [recentCrimes, setRecentCrimes] = useState([]);
     const[recentLogs,setRecentLogs]=useState([]);
     const[investigationProgress,setInvestigationProgress]=useState([]);
-    const[search ,serSearch] = useState("");
+    const[search ,setSearch] = useState("");
     const[searchResults,setSearchResults] = useState([]);
 
 
@@ -151,6 +151,123 @@ const handleSearch = async () => {
                 >
                     Dashboard
                 </h1>
+                <div
+    className="
+        flex
+        gap-3
+        mb-8
+    "
+>
+
+    <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search Crimes..."
+        className="
+            flex-1
+            p-3
+            rounded-lg
+            border
+            border-slate-300
+            dark:bg-slate-700
+            dark:text-white
+            dark:border-slate-600
+        "
+    />
+
+    <button
+        onClick={handleSearch}
+        className="
+            px-5
+            py-3
+            bg-blue-600
+            text-white
+            rounded-lg
+            hover:bg-blue-700
+        "
+    >
+        Search
+    </button>
+
+</div>
+
+{
+    searchResults.length > 0 && (
+
+        <div
+            className="
+                bg-white
+                dark:bg-slate-700
+                rounded-2xl
+                p-6
+                shadow-lg
+                mb-8
+            "
+        >
+
+            <h2
+                className="
+                    text-xl
+                    font-bold
+                    mb-4
+                    dark:text-white
+                "
+            >
+                Search Results
+            </h2>
+
+            <div className="space-y-4">
+
+                {
+                    searchResults.map((crime) => (
+
+                        <div
+                            key={crime.id}
+                            className="
+                                border-b
+                                pb-3
+                            "
+                        >
+
+                            <p
+                                className="
+                                    font-semibold
+                                    dark:text-white
+                                "
+                            >
+                                {crime.title}
+                            </p>
+
+                            <p
+                                className="
+                                    text-sm
+                                    text-slate-500
+                                "
+                            >
+                                {crime.location}
+                            </p>
+
+                            <p
+                                className="
+                                    text-xs
+                                    text-slate-400
+                                "
+                            >
+                                {crime.status}
+                            </p>
+
+                        </div>
+
+                    ))
+                }
+
+            </div>
+
+        </div>
+
+    )
+}
 
                 {/* Stats Cards */}
 

@@ -344,3 +344,43 @@ def recent_logs(
         }
         for log in logs
     ]
+@router.get("/search")
+def search_crimes(
+    q: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+
+    # ADMIN
+    if current_user.role == "admin":
+
+        crimes = db.query(Crime).filter(
+            Crime.title.ilike(f"%{q}%")
+        ).all()
+
+    # OFFICER
+    elif current_user.role == "officer":
+
+        crimes = db.query(Crime).filter(
+            Crime.assigned_officer_id == current_user.id,
+            Crime.title.ilike(f"%{q}%")
+        ).all()
+
+    # CITIZEN
+    else:
+
+        crimes = db.query(Crime).filter(
+            Crime.reported_by == current_user.id,
+            Crime.title.ilike(f"%{q}%")
+        ).all()
+
+    return [
+        {
+            "id": crime.id,
+            "title": crime.title,
+            "location": crime.location,
+            "status": crime.status,
+            "created_at": str(crime.created_at)
+        }
+        for crime in crimes
+    ]

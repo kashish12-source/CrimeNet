@@ -33,9 +33,10 @@ class User(Base):
     evidence = relationship(
     "Evidence",
     back_populates="officer"
-)
-    notifications=relationship(
-        "Notification",
-        back_populates="user"
-
+    )
+    
+    notifications = relationship(
+    "Notification",
+    back_populates="user",
+    cascade="all, delete-orphan"
     )

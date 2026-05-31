@@ -10,10 +10,15 @@ import DashboardChart from "../components/DashboardChart";
 import InvestigationChart from "../components/InvestigationChart";
 
 import {
-  getDashboardStats,
-  getDashboardChartData
-}
-from "../../Services/dashboardService";
+    getDashboardStats,
+    getDashboardChartData,
+    getRecentCrimes,
+    getRecentLogs,
+    getInvestigationProgress,
+    searchCrimes
+} from "../../Services/dashboardService";
+
+
 function Dashboard() {
 
     const [stats, setStats] = useState({
@@ -23,16 +28,57 @@ function Dashboard() {
         officers: 0,
     });
     const [chartData,setChartData] = useState({
-  crime_status:[],
-  investigation_progress:[]
-});
+    crime_status:[],
+    investigation_progress:[]
+    });
+    const [recentCrimes, setRecentCrimes] = useState([]);
+    const[recentLogs,setRecentLogs]=useState([]);
+    const[investigationProgress,setInvestigationProgress]=useState([]);
+    const[search ,serSearch] = useState("");
+    const[searchResults,setSearchResults] = useState([]);
 
-    useEffect(() => {
 
-  fetchDashboardStats();
-  fetchChartData();
-
+useEffect(() => {
+    fetchDashboardStats();
+    fetchChartData();
+    fetchRecentCrimes();
+    fetchRecentLogs();
+    fetchInvestigationProgress();
 }, []);
+const fetchInvestigationProgress = async() => {
+    try{
+        const data = await getInvestigationProgress();  
+        setInvestigationProgress(data);
+        
+    }
+    catch(error)
+    {
+        console.log(error);
+        alert("failed to fetch investigation progress data");
+    }
+}
+const fetchRecentLogs = async () => {
+    try {
+        const data = await getRecentLogs();
+        setRecentLogs(data);
+    } catch (error) {
+        console.log(error);
+        alert("failed to fetch recent logs");
+    }
+};
+
+const fetchRecentCrimes = async() => {
+    try{
+        const data= await getRecentCrimes();
+        setRecentCrimes(data);
+
+    }
+    catch(error)
+    {
+        console.log(error);
+        alert("failed to fetch recent crimes");
+    }
+};
 const fetchDashboardStats = async () => {
 
     try {
@@ -47,7 +93,7 @@ const fetchDashboardStats = async () => {
     }
 };
 
-    const fetchChartData = async () => {
+const fetchChartData = async () => {
 
   try {
 
@@ -60,6 +106,27 @@ const fetchDashboardStats = async () => {
 
     console.log(err);
   }
+};
+const handleSearch = async () => {
+
+    if (!search.trim()) {
+        setSearchResults([]);
+        return;
+    }
+
+    try {
+
+        const data = await searchCrimes(search);
+
+        setSearchResults(data);
+
+    }
+    catch (error) {
+
+        console.log(error);
+
+        alert("Search failed");
+    }
 };
 
    return (
@@ -136,7 +203,7 @@ const fetchDashboardStats = async () => {
 />
 
 <InvestigationChart
-  data={chartData.investigation_progress}
+  data={investigationProgress}
 />
 
                 </div>
@@ -173,22 +240,66 @@ const fetchDashboardStats = async () => {
                         >
                             Recent Crimes
                         </h2>
+                        
 
-                        {/* <div className="space-y-4">
+                        <div className="space-y-4">
 
-                            <div className="border-b pb-3">
-                                Theft reported in Bhopal
-                            </div>
+    {
+        recentCrimes.length > 0
+        ?
+        recentCrimes.map((crime) => (
 
-                            <div className="border-b pb-3">
-                                Cyber Fraud investigation
-                            </div>
+            <div
+                key={crime.id}
+                className="
+                    border-b
+                    pb-3
+                "
+            >
 
-                            <div className="border-b pb-3">
-                                Vehicle Theft solved
-                            </div>
+                <p
+                    className="
+                        font-semibold
+                        dark:text-white
+                    "
+                >
+                    {crime.title}
+                </p>
 
-                        </div> */}
+                <p
+                    className="
+                        text-sm
+                        text-slate-500
+                    "
+                >
+                    {crime.location}
+                </p>
+
+                <p
+                    className="
+                        text-xs
+                        text-slate-400
+                    "
+                >
+                    {crime.created_at}
+                </p>
+
+            </div>
+
+        ))
+        :
+        (
+            <p
+                className="
+                    text-slate-500
+                "
+            >
+                No crimes found
+            </p>
+        )
+    }
+
+</div>
 
                     </div>
 
@@ -213,19 +324,22 @@ const fetchDashboardStats = async () => {
                             Activity Logs
                         </h2>
 
-                        <div className="space-y-4">
-
-                            <div className="border-b pb-3">
-                                Officer assigned to Case #101
-                            </div>
-
-                            <div className="border-b pb-3">
-                                Case #95 marked Solved
-                            </div>
-
-                            <div className="border-b pb-3">
-                                New citizen complaint registered
-                            </div>
+                       <div className="space-y-4">
+                        {
+                            recentLogs.length > 0 ? (
+                                recentLogs.map((log) => (
+                                    <div key={log.id} className="border-b pb-3">
+                                        <p className="text-sm dark:text-white font-semibold">{log.action}</p>
+                                        <p className="text-xs text-slate-400">{log.timestamp}</p>
+                                        {log.performed_by && (
+                                            <p className="text-xs text-slate-500">By: {log.performed_by}</p>
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-slate-500">No activity logs found</p>
+                            )
+                        }
 
                         </div>
 

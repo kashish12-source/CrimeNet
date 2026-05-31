@@ -200,9 +200,9 @@ def investigation_progress(
         ).count()
 
         result.append({
-            "crime": f"Crime {crime.id}",
-            "notes": notes
-        })
+    "name": crime.title,
+    "count": notes
+})
 
     return result
 @router.get("/location-chart")
@@ -277,3 +277,70 @@ def get_chart_data(
             }
         ]
     }
+@router.get("/recent-crimes")
+def recent_crimes(
+    db:Session=Depends(get_db),
+    current_user:User=Depends(get_current_user)
+):
+    if current_user.role == "citizen":
+
+        crimes = (
+            db.query(Crime)
+            .filter(
+                Crime.reported_by == current_user.id
+            )
+            .order_by(Crime.created_at.desc())
+            .limit(5)
+            .all()
+        )
+    elif current_user.role == "officer":
+
+        crimes = (
+            db.query(Crime)
+            .filter(
+                Crime.assigned_officer_id ==
+                current_user.id
+            )
+            .order_by(Crime.created_at.desc())
+            .limit(5)
+            .all()
+        )
+    else:
+
+        crimes = (
+            db.query(Crime)
+            .order_by(Crime.created_at.desc())
+            .limit(5)
+            .all()
+        )
+    return [
+        {
+            "id": crime.id,
+            "title": crime.title,
+            "location": crime.location,
+            "status": crime.status,
+            "created_at": str(crime.created_at)
+        }
+        for crime in crimes
+    ]
+@router.get("/recent-logs")
+def recent_logs(
+    db:Session=Depends(get_db),
+    current_user:User=Depends(get_current_user)
+):
+    logs=db.query(Activity_logs).order_by(Activity_logs.timestamp.desc()).limit(5).all()
+    if not logs:
+        raise HTTPException(
+            status_code=404,
+            detail="No activity logs found"
+        )
+    return [
+        {
+            "id": log.id,
+            "action": log.action,
+            "timestamp": str(log.timestamp),
+            "crime_id": log.crime_id,
+            "performed_by": log.performed_by
+        }
+        for log in logs
+    ]

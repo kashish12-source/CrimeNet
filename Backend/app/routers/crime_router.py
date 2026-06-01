@@ -2,6 +2,7 @@ from fastapi import HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import Optional
 
+from app.utils.notifications import create_notification
 from app.utils.logger import activity_logs
 
 from app.database.connection import SessionLocal
@@ -95,7 +96,17 @@ def create_crime(
     officers = db.query(User).filter(
         User.role == "officer"
     ).all()
+    admins = db.query(User).filter(
+    User.role == "admin"
+    ).all()
 
+    for admin in admins:
+        create_notification(
+            db=db,
+            user_id=admin.id,
+            message=f"New crime reported: {new_crime.title}",
+            link=f"/crime/{new_crime.id}"
+        )
     for officer in officers:
         notification = Notification(
             message=f"New crime reported: {new_crime.title}",
@@ -150,7 +161,12 @@ def assign_officer(
 
     # ASSIGN OFFICER
     crime.assigned_officer_id = officer.id
-
+    create_notification(
+    db=db,
+    user_id=crime.reported_by,
+    message=f"Officer {officer.username} has been assigned to your case",
+    link=f"/officer/{officer.id}"
+)
     db.commit()
 
     db.refresh(crime)
@@ -244,6 +260,23 @@ current_user: User = Depends(get_current_user)
         )
 
     crime.status = data.status
+    create_notification(
+    db=db,
+    user_id=crime.reported_by,
+    message=f"Your crime status has been updated to {data.status}",
+    link=f"/crime/{crime.id}"
+)
+    admins = db.query(User).filter(
+    User.role == "admin"
+).all()
+
+    for admin in admins:
+        create_notification(
+            db=db,
+            user_id=admin.id,
+            message=f"Crime '{crime.title}' status updated to {data.status}",
+            link=f"/crime/{crime.id}"
+        )
 
     db.commit()
 

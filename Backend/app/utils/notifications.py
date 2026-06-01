@@ -13,6 +13,6 @@ def create_notification(
         link=link
     )
     db.add(notification)
-    db.commit()
+    db.flush()
 
     return notification

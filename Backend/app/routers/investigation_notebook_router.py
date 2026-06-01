@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.utils.logger import activity_logs
 from app.database.connection import get_db
-
+from app.utils.notifications import create_notification
 # MODELS
 from app.models.investigation_notebook_model import InvestigationBook
 from app.models.crime_model import Crime
@@ -102,13 +102,35 @@ def add_investigation(
     db.commit()
 
     db.refresh(new_note)
-    # add to activit logs
-    activity_logs(
+    # Notify Citizen
+
+    create_notification(
         db=db,
-        action="Investigation Note Added",
-        crime_id=crime_id,
-        user_id=officer_id
+        user_id=crime.reported_by,
+        message=f"New investigation update added for your case",
+        link=f"/crime/{crime.id}"
     )
+
+    # Notify Admins
+
+    admins = db.query(User).filter(
+        User.role == "admin"
+    ).all()
+
+    for admin in admins:
+        create_notification(
+            db=db,
+            user_id=admin.id,
+            message=f"Investigation note added to case: {crime.title}",
+            link=f"/crime/{crime.id}"
+        )
+        # add to activit logs
+        activity_logs(
+            db=db,
+            action="Investigation Note Added",
+            crime_id=crime_id,
+            user_id=officer_id
+        )
 
     return new_note
 from app.auth.encryption import decrypt_notes

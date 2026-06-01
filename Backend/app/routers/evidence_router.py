@@ -4,6 +4,7 @@ from app.database.connection import get_db
 import shutil
 import os
 from app.utils.logger import activity_logs
+from app.utils.notifications import create_notification
  
 # importing auths:
 from app.auth.encryption import encrypt_notes,decrypt_notes
@@ -70,6 +71,28 @@ def post_evidence(crime_id:int ,
     db.add(new_evidence)
     db.commit()
     db.refresh(new_evidence)
+    # Notify Citizen
+
+    create_notification(
+        db=db,
+        user_id=crime.reported_by,
+        message=f"New evidence uploaded for your case: {crime.title}",
+        link=f"/crime/{crime.id}"
+    )
+
+    # Notify Admins
+
+    admins = db.query(User).filter(
+            User.role == "admin"
+        ).all()
+
+    for admin in admins:
+            create_notification(
+                db=db,
+                user_id=admin.id,
+                message=f"Evidence uploaded for case: {crime.title}",
+                link=f"/crime/{crime.id}"
+            )
 
     # adding activity logs
     activity_logs(

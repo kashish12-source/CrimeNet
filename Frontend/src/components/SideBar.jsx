@@ -78,12 +78,12 @@ function SideBar() {
                             Officers
                         </Link>
 
-                        <Link
+                        {/* <Link
                             to="/notifications"
                             className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                         >
-                            Notifications
-                        </Link>
+                            
+                        </Link> */}
                         <Link
                             to="/assign-crime"
                             className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"

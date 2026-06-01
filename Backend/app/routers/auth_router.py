@@ -49,9 +49,14 @@ def registerUser(
         phone_number=user.phone_number,
        
     )
+    print("REGISTER API HIT")
     db.add(new_user)
+    
+    print("BEFORE COMMIT")
     db.commit()
+    print("AFTER COMMIT")
     db.refresh(new_user)
+    print("USER ID:", new_user.id)
     activity_logs(
         db=db,
         action="user register successfully",

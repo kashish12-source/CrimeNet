@@ -31,7 +31,7 @@ function Officers() {
 
     return (
 
-        <div className="flex bg-gray-100 min-h-screen">
+        <div className="flex bg-slate-100 dark:bg-slate-800 min-h-screen">
 
             <SideBar />
 
@@ -41,7 +41,7 @@ function Officers() {
 
                 <div className="p-6">
 
-                    <h1 className="text-3xl font-bold mb-6">
+                    <h1 className="text-3xl font-bold mb-6 text-slate-900 dark:text-white">
                         Officers
                     </h1>
 
@@ -51,22 +51,22 @@ function Officers() {
 
                             <div
                                 key={officer.id}
-                                className="bg-white p-5 rounded-xl shadow-md"
+                                className="bg-white dark:bg-slate-700 p-5 rounded-xl shadow-md"
                             >
 
-                                <h2 className="text-2xl font-bold">
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
                                     {officer.username}
                                 </h2>
 
-                                <p className="mt-2 text-gray-600">
+                                <p className="mt-2 text-slate-600 dark:text-slate-300">
                                     {officer.email}
                                 </p>
 
-                                <p className="mt-2">
+                                <p className="mt-2 text-slate-900 dark:text-slate-100">
                                     Role: {officer.role}
                                 </p>
 
-                                <p className="mt-2">
+                                <p className="mt-2 text-slate-900 dark:text-slate-100">
                                     Phone: {officer.phone_number}
                                 </p>
 

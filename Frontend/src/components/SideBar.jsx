@@ -39,6 +39,13 @@ function SideBar() {
                         >
                             My Crimes
                         </Link>
+
+                        <Link
+                            to="/kyc"
+                            className="block rounded-lg px-3 py-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
+                            KYC Verification
+                        </Link>
                     </>
                 )}
 
@@ -78,17 +85,18 @@ function SideBar() {
                             Officers
                         </Link>
 
-                        {/* <Link
-                            to="/notifications"
-                            className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-                        >
-                            
-                        </Link> */}
                         <Link
                             to="/assign-crime"
                             className="block rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                         >
                             Assign Crime
+                        </Link>
+
+                        <Link
+                            to="/blockchain-audit"
+                            className="block rounded-lg px-3 py-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                        >
+                            Blockchain Audit
                         </Link>
                     </>
                 )}

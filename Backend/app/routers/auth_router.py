@@ -108,6 +108,99 @@ def loginUser(
 def read_users_me(current_user:User=Depends(get_current_user)):
     return current_user
 
+from fastapi import UploadFile, File, Form
+import shutil
+import random
+
+OTP_STORE = {}
+
+@router.post("/citizen/verify-id")
+def verify_citizen_id(
+    id_proof_type: str = Form(...),
+    id_proof_number: str = Form(...),
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "citizen":
+        raise HTTPException(status_code=400, detail="Only citizens can verify their ID")
+        
+    if len(id_proof_number.strip()) < 5:
+        raise HTTPException(status_code=400, detail="Invalid ID Proof Number length")
+        
+    file_path = f"uploads/id_{current_user.id}_{file.filename}"
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    current_user.is_verified = True
+    current_user.id_proof_type = id_proof_type
+    current_user.id_proof_number = id_proof_number
+    current_user.id_proof_url = file_path
+    
+    db.commit()
+    db.refresh(current_user)
+    
+    activity_logs(
+        db=db,
+        action=f"Citizen ID verified ({id_proof_type})",
+        user_id=current_user.id
+    )
+    
+    return {
+        "message": "ID verified successfully with Government Portal",
+        "user": {
+            "id": current_user.id,
+            "is_verified": current_user.is_verified,
+            "id_proof_type": current_user.id_proof_type,
+            "id_proof_number": current_user.id_proof_number,
+            "id_proof_url": current_user.id_proof_url
+        }
+    }
+
+@router.post("/citizen/send-otp")
+def send_phone_otp(
+    phone_number: str = Form(...),
+    current_user: User = Depends(get_current_user)
+):
+    otp_code = str(random.randint(100000, 999999))
+    OTP_STORE[current_user.id] = otp_code
+    
+    print(f"\n==========================================")
+    print(f"SMS GATEWAY: Sending OTP {otp_code} to {phone_number}")
+    print(f"==========================================\n")
+    
+    return {
+        "message": "OTP sent successfully to your phone number",
+        "otp_code": otp_code
+    }
+
+@router.post("/citizen/verify-otp")
+def verify_phone_otp(
+    otp_code: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    stored_code = OTP_STORE.get(current_user.id)
+    if not stored_code or stored_code != otp_code:
+        raise HTTPException(status_code=400, detail="Invalid OTP code or OTP expired")
+        
+    current_user.phone_verified = True
+    db.commit()
+    db.refresh(current_user)
+    
+    OTP_STORE.pop(current_user.id, None)
+    
+    activity_logs(
+        db=db,
+        action="Citizen phone verified via OTP",
+        user_id=current_user.id
+    )
+    
+    return {
+        "message": "Phone number verified successfully",
+        "phone_verified": current_user.phone_verified
+    }
+
       
 
 

@@ -73,7 +73,9 @@ def create_officer(
         password=hashed_password,
         role="officer",
         address=officer.address,
-        phone_number=officer.phone_number
+        phone_number=officer.phone_number,
+        specialization=officer.specialization,
+        assigned_area=officer.assigned_area
     )
 
     db.add(new_officer)
@@ -163,3 +165,23 @@ def assign_officer(
     return {
         "message": "Officer assigned successfully"
     }
+
+# BLOCKCHAIN LEDGER RETRIEVAL
+from app.utils.blockchain import verify_ledger_integrity
+from app.models.blockchain_model import BlockchainBlock
+
+@router.get("/blockchain/ledger")
+def get_blockchain_ledger(
+    db: Session = Depends(get_db),
+    admin: User = Depends(admin_required)
+):
+    blocks = db.query(BlockchainBlock).order_by(BlockchainBlock.block_index.asc()).all()
+    return blocks
+
+@router.get("/blockchain/verify")
+def get_blockchain_verify(
+    db: Session = Depends(get_db),
+    admin: User = Depends(admin_required)
+):
+    result = verify_ledger_integrity(db)
+    return result

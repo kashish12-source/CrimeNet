@@ -1,5 +1,5 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column,Integer,String,Date,ForeignKey
+from sqlalchemy import Column,Integer,String,Date,ForeignKey,Boolean
 from datetime import date
 
 from app.database.base import Base
@@ -23,6 +23,9 @@ class User(Base):
     phone_number = Column(String, nullable=False)
 
     created_at = Column(Date, default=date.today)
+    
+    specialization = Column(String, nullable=True)
+
 
     crimes = relationship(
         "Crime",
@@ -40,3 +43,33 @@ class User(Base):
     back_populates="user",
     cascade="all, delete-orphan"
     )
+  
+    assigned_area = Column(
+        String,
+        nullable=True
+    )
+
+    is_verified = Column(
+        Boolean,
+        default=False
+    )
+
+    id_proof_type = Column(
+        String,
+        nullable=True
+    )
+
+    id_proof_number = Column(
+        String,
+        nullable=True
+    )
+
+    id_proof_url = Column(
+        String,
+        nullable=True
+    )
+
+    phone_verified = Column(
+        Boolean,
+        default=False
+    )

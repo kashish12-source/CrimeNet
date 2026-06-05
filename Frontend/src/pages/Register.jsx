@@ -58,7 +58,8 @@ return (
     <div
         className="
             min-h-screen
-            bg-gray-100
+            bg-slate-100
+            dark:bg-slate-800
             flex
             items-center
             justify-center
@@ -69,6 +70,7 @@ return (
         <div
             className="
                 bg-white
+                dark:bg-slate-700
                 w-full
                 max-w-lg
                 p-8
@@ -83,6 +85,8 @@ return (
                     font-bold
                     text-center
                     mb-2
+                    text-slate-900
+                    dark:text-slate-100
                 "
             >
                 Create Account
@@ -90,7 +94,8 @@ return (
 
             <p
                 className="
-                    text-gray-500
+                    text-slate-500
+                    dark:text-slate-300
                     text-center
                     mb-8
                 "
@@ -113,6 +118,10 @@ return (
                         w-full
                         border
                         border-gray-300
+                        bg-white
+                        dark:bg-slate-900
+                        dark:text-slate-100
+                        dark:border-slate-600
                         p-3
                         rounded-lg
                     "
@@ -129,6 +138,10 @@ return (
                         w-full
                         border
                         border-gray-300
+                        bg-white
+                        dark:bg-slate-900
+                        dark:text-slate-100
+                        dark:border-slate-600
                         p-3
                         rounded-lg
                     "
@@ -145,6 +158,10 @@ return (
                         w-full
                         border
                         border-gray-300
+                        bg-white
+                        dark:bg-slate-900
+                        dark:text-slate-100
+                        dark:border-slate-600
                         p-3
                         rounded-lg
                     "
@@ -159,6 +176,10 @@ return (
                         w-full
                         border
                         border-gray-300
+                        bg-white
+                        dark:bg-slate-900
+                        dark:text-slate-100
+                        dark:border-slate-600
                         p-3
                         rounded-lg
                     "
@@ -191,6 +212,10 @@ return (
                         w-full
                         border
                         border-gray-300
+                        bg-white
+                        dark:bg-slate-900
+                        dark:text-slate-100
+                        dark:border-slate-600
                         p-3
                         rounded-lg
                     "
@@ -207,6 +232,10 @@ return (
                         w-full
                         border
                         border-gray-300
+                        bg-white
+                        dark:bg-slate-900
+                        dark:text-slate-100
+                        dark:border-slate-600
                         p-3
                         rounded-lg
                     "
@@ -217,10 +246,14 @@ return (
                     type="submit"
                     className="
                         w-full
-                        bg-black
+                        bg-blue-600
+                        dark:bg-blue-500
                         text-white
                         p-3
                         rounded-lg
+                        hover:bg-blue-700
+                        dark:hover:bg-blue-600
+                        transition
                     "
                 >
                     Register
@@ -229,7 +262,8 @@ return (
                 <p
                     className="
                         text-center
-                        text-gray-600
+                        text-slate-600
+                        dark:text-slate-300
                     "
                 >
                     Already have an account?{" "}
@@ -237,8 +271,10 @@ return (
                     <Link
                         to="/"
                         className="
-                            text-black
+                            text-blue-600
+                            dark:text-blue-400
                             font-semibold
+                            hover:underline
                         "
                     >
                         Login

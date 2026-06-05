@@ -2,7 +2,8 @@ from sqlalchemy import (
     Column,
     Integer,
     String,
-    ForeignKey
+    ForeignKey,
+    Float
 )
 
 from sqlalchemy.orm import relationship
@@ -33,6 +34,16 @@ class Evidence(Base):
     description = Column(
         String,
         nullable=False
+    )
+
+    latitude = Column(
+        Float,
+        nullable=True
+    )
+
+    longitude = Column(
+        Float,
+        nullable=True
     )
 
     crime_id = Column(

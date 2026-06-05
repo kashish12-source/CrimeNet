@@ -30,7 +30,7 @@ function AllCrimes() {
 
     return (
 
-        <div className="flex bg-gray-100 min-h-screen">
+        <div className="flex bg-slate-100 dark:bg-slate-800 min-h-screen">
 
             <SideBar />
 
@@ -40,14 +40,14 @@ function AllCrimes() {
 
                 <div className="p-6">
 
-                    <h1 className="text-3xl font-bold mb-6">
+                    <h1 className="text-3xl font-bold mb-6 text-slate-900 dark:text-white">
                         All Crimes
                     </h1>
 
                     {
                         crimes.length === 0 ? (
 
-                            <p>No crimes found</p>
+                            <p className="text-slate-900 dark:text-slate-100">No crimes found</p>
 
                         ) : (
 

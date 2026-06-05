@@ -11,6 +11,7 @@ from app.models.investigation_notebook_model import InvestigationBook
 from app.models.evidence_model import Evidence
 from app.models.activitylogs_model import Activity_logs
 from app.models.notification_model import Notification
+from app.models.blockchain_model import BlockchainBlock
 
 
 # importing Routes:

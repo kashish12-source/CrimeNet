@@ -41,6 +41,14 @@ class CrimeResponse(BaseModel):
 
     created_at: Optional[date] = None
 
+    latitude: Optional[float] = None
+
+    longitude: Optional[float] = None
+
+    zone: Optional[str] = None
+
+    ai_analysis: Optional[str] = None
+
     class Config:
 
         from_attributes = True

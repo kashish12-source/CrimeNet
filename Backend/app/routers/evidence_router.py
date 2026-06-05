@@ -3,8 +3,10 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 import shutil
 import os
+from typing import Optional
 from app.utils.logger import activity_logs
 from app.utils.notifications import create_notification
+from app.utils.blockchain import add_block_to_ledger
  
 # importing auths:
 from app.auth.encryption import encrypt_notes,decrypt_notes
@@ -33,9 +35,11 @@ allowed=[
 ]
 @router.post("/uploads/{crime_id}")
 def post_evidence(crime_id:int ,
-                current_user:User=Depends(get_current_user),
                 description:str=Form(...) ,
                 file:UploadFile=File(...),
+                latitude:Optional[float]=Form(None),
+                longitude:Optional[float]=Form(None),
+                current_user:User=Depends(get_current_user),
                 db:Session=Depends(get_db)):
     
     # check current user is officer or not:
@@ -64,6 +68,8 @@ def post_evidence(crime_id:int ,
         file_name=file.filename,
         file_path=file_path,
         description=description,
+        latitude=latitude,
+        longitude=longitude,
         crime_id=crime_id,
         uploaded_by=current_user.id
     )
@@ -101,6 +107,18 @@ def post_evidence(crime_id:int ,
         crime_id=crime_id,
         user_id=current_user.id
     )
+
+    # BLOCKCHAIN LOGGING
+    add_block_to_ledger(db, "EVIDENCE_UPLOADED", {
+        "crime_id": crime_id,
+        "crime_title": crime.title,
+        "evidence_id": new_evidence.id,
+        "file_name": file.filename,
+        "description": description,
+        "latitude": latitude,
+        "longitude": longitude,
+        "uploaded_by": current_user.username
+    })
 
     return new_evidence
 

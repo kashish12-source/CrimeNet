@@ -1,5 +1,5 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column,Integer,String,ForeignKey,Date
+from sqlalchemy import Column,Integer,String,ForeignKey,Date,Float,Text
 from datetime import date
 
 from app.database.base import Base
@@ -15,6 +15,14 @@ class Crime(Base):
     description = Column(String, nullable=False)
 
     location = Column(String, nullable=False)
+
+    latitude = Column(Float, nullable=True)
+
+    longitude = Column(Float, nullable=True)
+
+    zone = Column(String, nullable=True)
+
+    ai_analysis = Column(Text, nullable=True)
 
     status = Column(String, default="Pending")
 

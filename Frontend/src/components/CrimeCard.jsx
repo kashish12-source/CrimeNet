@@ -12,6 +12,7 @@ function CrimeCard({ crime }) {
             }
             className="
                 bg-white
+                dark:bg-slate-700
                 p-5
                 rounded-xl
                 shadow-md
@@ -21,15 +22,15 @@ function CrimeCard({ crime }) {
             "
         >
 
-            <h2 className="text-xl font-bold mb-2">
+            <h2 className="text-xl font-bold mb-2 text-slate-900 dark:text-white">
                 {crime.title}
             </h2>
 
-            <p className="text-gray-600 mb-3">
+            <p className="text-slate-600 dark:text-slate-300 mb-3">
                 {crime.description}
             </p>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
                 Location: {crime.location}
             </p>
 
@@ -37,7 +38,9 @@ function CrimeCard({ crime }) {
 
                 <span className="
                     bg-yellow-100
+                    dark:bg-yellow-900
                     text-yellow-700
+                    dark:text-yellow-100
                     px-3
                     py-1
                     rounded-full

@@ -1,0 +1,22 @@
+this is my existing project the crime net 
+in this project I have 3 users admin officer and the citzien 
+my ideas is 
+the citizen can report the crime and then officer will get assign to the crime reported by the citizen and investigation will be done the officer can be assigned on the basis of the zone of the location and the type of the crime 
+and when the officer is assigned the citizen will get the detail of the officer and can see all the updates related to the crime for validation of the citizen citizen need to upload any of the government ID proofs and aslo verify it from the government site if possible and also check the contact no. by sending the otp will be able to upload their current location of the crime by providing the maps features 
+any updates on the crime by the officer will be notified to the citizen in selection of the crime title give the oprions that are available and most common type of crimes 
+
+the admin will be able to create the officer and the crime type that can be solved by the officer and can see all the reports and updates on the crime admin will have authority to assign the station to which the officer is belonged and the officer will get only those crimes which lie under their areas and the nearer areas 
+officer can see the current location of the crime using the map feature
+and any new crimes in their area will be notified to the officer with the location the officer will be able to upload the investigation in the investigation notebook and the evidences pdf or image video and also location coordinates 
+police has authority to colse the report and update the status of the crime like closed ,solved, or under investigation
+
+can we use blockchain to make the records tamper proof and unchangeable ? and can we use AI to detect the crime from the image or video uploaded by the citizen ?
+
+then Admin can see all the reports and updates on the crime from the web page and will be able to update the status of the crime 
+it also contain the dashboard with the fields like total no. of cases , pending cases , solved cases , under investigation case and also the graph of the no. of cases reported in the last 24 hours , 1 week and 1 month and also the graph of the no. of cases solved in the last 24 hours , 1 week and 1 month 
+and the most important thing is that the admin will be able to update the status of the crime on the basis of the zones and the type of the crime 
+and can get all the notification of the new crimes in their area and can get the notification of the crimes which are reported near their area and can get the notification of the crimes which are reported in their area and can get the notification of the crimes which are reported in their area 
+
+the officer will be able to see the crimes reported near their area and can get the notification of the crimes which are reported near their area and can get the notification of the crimes which are reported in their area and can get the notification of the crimes which are reported in their area  
+
+make the Ui interative and user friendly 

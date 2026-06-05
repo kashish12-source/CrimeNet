@@ -1,6 +1,8 @@
-from fastapi import HTTPException, Depends, APIRouter
+from fastapi import HTTPException, Depends, APIRouter, Form, File, UploadFile
 from sqlalchemy.orm import Session
 from typing import Optional
+import json
+import shutil
 
 from app.utils.notifications import create_notification
 from app.utils.logger import activity_logs
@@ -18,6 +20,8 @@ UpdateStatus
 
 from app.auth.oauth2 import get_current_user
 from app.auth.encryption import decrypt_notes
+from app.utils.blockchain import add_block_to_ledger
+from app.services.ai_service import analyze_uploaded_media
 
 router = APIRouter(
 prefix="/crime",
@@ -35,13 +39,25 @@ def get_db():
 
 
 # =========================================
-
 # CREATE CRIME
-
 # =========================================
+ADJACENT_ZONES = {
+    "Central Zone": ["Central Zone", "North Zone", "South Zone", "East Zone", "West Zone"],
+    "North Zone": ["North Zone", "Central Zone", "East Zone", "West Zone"],
+    "South Zone": ["South Zone", "Central Zone", "East Zone", "West Zone"],
+    "East Zone": ["East Zone", "Central Zone", "North Zone", "South Zone"],
+    "West Zone": ["West Zone", "Central Zone", "North Zone", "South Zone"]
+}
+
 @router.post("/crime")
 def create_crime(
-    crime: CrimeCreate,
+    title: str = Form(...),
+    description: str = Form(...),
+    location: str = Form(...),
+    latitude: Optional[float] = Form(None),
+    longitude: Optional[float] = Form(None),
+    zone: Optional[str] = Form(None),
+    file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -53,35 +69,48 @@ def create_crime(
         )
 
     # Validate input
-    if not crime.title or not crime.title.strip():
+    if not title or not title.strip():
         raise HTTPException(
             status_code=400,
             detail="Title cannot be empty"
         )
 
-    if not crime.description or not crime.description.strip():
+    if not description or not description.strip():
         raise HTTPException(
             status_code=400,
             detail="Description cannot be empty"
         )
 
-    if not crime.location or not crime.location.strip():
+    if not location or not location.strip():
         raise HTTPException(
             status_code=400,
             detail="Location cannot be empty"
         )
 
+    # Process media file & run AI analysis
+    ai_result_str = None
+    if file:
+        file_path = f"uploads/report_{file.filename}"
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # Call AI Analysis service
+        ai_res = analyze_uploaded_media(file_path, file.filename, description)
+        ai_result_str = json.dumps(ai_res)
+
     # Create crime
     new_crime = Crime(
-        title=crime.title.strip(),
-        description=crime.description.strip(),
-        location=crime.location.strip(),
+        title=title.strip(),
+        description=description.strip(),
+        location=location.strip(),
+        latitude=latitude,
+        longitude=longitude,
+        zone=zone,
+        ai_analysis=ai_result_str,
         reported_by=current_user.id
     )
 
     db.add(new_crime)
-
-    # Generate ID without committing
     db.flush()
 
     # Create activity log
@@ -92,32 +121,47 @@ def create_crime(
         user_id=current_user.id
     )
 
-    # Send notifications to all officers
-    officers = db.query(User).filter(
-        User.role == "officer"
-    ).all()
-    admins = db.query(User).filter(
-    User.role == "admin"
-    ).all()
+    # BLOCKCHAIN LOGGING
+    blockchain_payload = {
+        "crime_id": new_crime.id,
+        "title": new_crime.title,
+        "description": new_crime.description,
+        "location": new_crime.location,
+        "latitude": new_crime.latitude,
+        "longitude": new_crime.longitude,
+        "zone": new_crime.zone,
+        "reported_by": current_user.username,
+        "ai_scan": ai_result_str
+    }
+    add_block_to_ledger(db, "CRIME_REPORTED", blockchain_payload)
 
+    # Send notifications based on proximity zone
+    admins = db.query(User).filter(User.role == "admin").all()
     for admin in admins:
         create_notification(
             db=db,
             user_id=admin.id,
-            message=f"New crime reported: {new_crime.title}",
+            message=f"New crime reported: {new_crime.title} in {new_crime.zone or 'unknown zone'}",
             link=f"/crime/{new_crime.id}"
         )
+
+    # Find officers in same or adjacent zone
+    officer_query = db.query(User).filter(User.role == "officer")
+    if zone and zone in ADJACENT_ZONES:
+        allowed_areas = ADJACENT_ZONES[zone]
+        officers = officer_query.filter(User.assigned_area.in_(allowed_areas)).all()
+    else:
+        officers = officer_query.all()
+
     for officer in officers:
         notification = Notification(
-            message=f"New crime reported: {new_crime.title}",
-            user_id=officer.id
+            message=f"ALERT: New crime reported in/near your area: {new_crime.title} ({new_crime.zone or 'General'})",
+            user_id=officer.id,
+            link=f"/crime/{new_crime.id}"
         )
-
         db.add(notification)
 
-    # Save everything together
     db.commit()
-
     db.refresh(new_crime)
 
     return new_crime
@@ -188,6 +232,14 @@ def assign_officer(
         crime_id=crime.id,
         user_id=current_user.id
     )
+
+    # BLOCKCHAIN LOGGING
+    add_block_to_ledger(db, "OFFICER_ASSIGNED", {
+        "crime_id": crime.id,
+        "crime_title": crime.title,
+        "officer_id": officer.id,
+        "officer_username": officer.username
+    })
 
     return {
         "message": "Officer assigned successfully",
@@ -289,6 +341,14 @@ current_user: User = Depends(get_current_user)
         user_id=current_user.id
     )
 
+    # BLOCKCHAIN LOGGING
+    add_block_to_ledger(db, "STATUS_UPDATED", {
+        "crime_id": crime.id,
+        "crime_title": crime.title,
+        "status": data.status,
+        "updated_by": current_user.username
+    })
+
     return {
         "message": "Status updated",
         "crime": crime
@@ -331,6 +391,13 @@ current_user: User = Depends(get_current_user)
         user_id=current_user.id
     )
 
+    # BLOCKCHAIN LOGGING
+    add_block_to_ledger(db, "CASE_CLOSED", {
+        "crime_id": crime.id,
+        "crime_title": crime.title,
+        "closed_by": current_user.username
+    })
+
     return {
         "message": "Case closed successfully"
     }
@@ -367,6 +434,14 @@ db: Session = Depends(get_db)
 
         "created_at": crime.created_at,
 
+        "latitude": crime.latitude,
+
+        "longitude": crime.longitude,
+
+        "zone": crime.zone,
+
+        "ai_analysis": crime.ai_analysis,
+
         "investigations": [
 
             {
@@ -391,7 +466,11 @@ db: Session = Depends(get_db)
 
                 "file_path": evidence.file_path,
 
-                "description": evidence.description
+                "description": evidence.description,
+
+                "latitude": evidence.latitude,
+
+                "longitude": evidence.longitude
             }
 
             for evidence in crime.evidence

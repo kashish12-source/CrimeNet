@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.utils.logger import activity_logs
 from app.database.connection import get_db
 from app.utils.notifications import create_notification
+from app.utils.blockchain import add_block_to_ledger
 # MODELS
 from app.models.investigation_notebook_model import InvestigationBook
 from app.models.crime_model import Crime
@@ -131,6 +132,15 @@ def add_investigation(
             crime_id=crime_id,
             user_id=officer_id
         )
+
+    # BLOCKCHAIN LOGGING
+    add_block_to_ledger(db, "NOTE_ADDED", {
+        "crime_id": crime_id,
+        "crime_title": crime.title,
+        "note_id": new_note.id,
+        "officer_id": officer_id,
+        "officer_username": current_officer.username
+    })
 
     return new_note
 from app.auth.encryption import decrypt_notes

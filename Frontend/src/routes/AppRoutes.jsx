@@ -13,6 +13,8 @@ import CrimeDetails from "../pages/CrimeDetails";
 import ReportCrime from "../pages/ReportCrime";
 import AllCrimes from "../pages/AllCrimes";
 import AssignedCrimes from "../pages/AssignedCrime";
+import CitizenKYC from "../pages/CitizenKYC";
+import BlockchainAudit from "../pages/BlockchainAudit";
 
 function AppRoutes() {
 
@@ -93,6 +95,24 @@ function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <CrimeDetails />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/kyc"
+                element={
+                    <ProtectedRoute allowedRoles={["citizen"]}>
+                        <CitizenKYC />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/blockchain-audit"
+                element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                        <BlockchainAudit />
                     </ProtectedRoute>
                 }
             />

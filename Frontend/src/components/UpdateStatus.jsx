@@ -18,10 +18,19 @@ function UpdateStatus({crimeId}){
        
 
 return(
-      <div className="mt-4">
+      <div className="mt-4 flex gap-3">
 
             <select
-                className="border p-2 rounded-lg"
+                className="
+                    border
+                    border-slate-300
+                    dark:border-slate-600
+                    bg-white
+                    dark:bg-slate-900
+                    dark:text-white
+                    p-2
+                    rounded-lg
+                "
                 onChange={(e) => setStatus(e.target.value)}
             >
 
@@ -48,12 +57,15 @@ return(
             <button
                 onClick={handleUpdate}
                 className="
-                    ml-3
                     bg-green-600
+                    dark:bg-green-500
+                    hover:bg-green-700
+                    dark:hover:bg-green-600
                     text-white
                     px-4
                     py-2
                     rounded-lg
+                    transition
                 "
             >
                 Save

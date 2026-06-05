@@ -262,11 +262,11 @@ function Dashboard() {
                       className="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 dark:text-white p-2 rounded-lg text-sm"
                     >
                       <option value="">All Zones</option>
-                      <option value="Central Zone">Central Zone</option>
-                      <option value="North Zone">North Zone</option>
-                      <option value="South Zone">South Zone</option>
-                      <option value="East Zone">East Zone</option>
-                      <option value="West Zone">West Zone</option>
+                      <option value="Central Zone (Bhopal)">Central Zone (Bhopal)</option>
+                      <option value="West Zone (Indore)">West Zone (Indore)</option>
+                      <option value="East Zone (Jabalpur)">East Zone (Jabalpur)</option>
+                      <option value="North Zone (Gwalior)">North Zone (Gwalior)</option>
+                      <option value="South Zone (Narmadapuram)">South Zone (Narmadapuram)</option>
                     </select>
                   </div>
 

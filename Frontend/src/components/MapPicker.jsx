@@ -15,15 +15,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const DEFAULT_CENTER = [28.6139, 77.2090]; // Delhi Center
+const DEFAULT_CENTER = [23.2599, 77.4126]; // Bhopal, Madhya Pradesh
 
-// Helper to determine city zone from coordinates
+// Helper to determine city zone from coordinates (adapted for Madhya Pradesh)
 export const resolveZoneFromCoords = (lat, lng) => {
-  if (lat > 28.65) return "North Zone";
-  if (lat < 28.58) return "South Zone";
-  if (lng > 77.24) return "East Zone";
-  if (lng < 77.18) return "West Zone";
-  return "Central Zone";
+  if (lat > 24.5) return "North Zone (Gwalior)";
+  if (lng < 76.5) return "West Zone (Indore)";
+  if (lng > 78.5) return "East Zone (Jabalpur)";
+  if (lat < 23.0) return "South Zone (Narmadapuram)";
+  return "Central Zone (Bhopal)";
 };
 
 // Component to dynamically update map center

@@ -42,11 +42,11 @@ def get_db():
 # CREATE CRIME
 # =========================================
 ADJACENT_ZONES = {
-    "Central Zone": ["Central Zone", "North Zone", "South Zone", "East Zone", "West Zone"],
-    "North Zone": ["North Zone", "Central Zone", "East Zone", "West Zone"],
-    "South Zone": ["South Zone", "Central Zone", "East Zone", "West Zone"],
-    "East Zone": ["East Zone", "Central Zone", "North Zone", "South Zone"],
-    "West Zone": ["West Zone", "Central Zone", "North Zone", "South Zone"]
+    "Central Zone (Bhopal)": ["Central Zone (Bhopal)", "North Zone (Gwalior)", "South Zone (Narmadapuram)", "East Zone (Jabalpur)", "West Zone (Indore)"],
+    "North Zone (Gwalior)": ["North Zone (Gwalior)", "Central Zone (Bhopal)", "East Zone (Jabalpur)", "West Zone (Indore)"],
+    "South Zone (Narmadapuram)": ["South Zone (Narmadapuram)", "Central Zone (Bhopal)", "East Zone (Jabalpur)", "West Zone (Indore)"],
+    "East Zone (Jabalpur)": ["East Zone (Jabalpur)", "Central Zone (Bhopal)", "North Zone (Gwalior)", "South Zone (Narmadapuram)"],
+    "West Zone (Indore)": ["West Zone (Indore)", "Central Zone (Bhopal)", "North Zone (Gwalior)", "South Zone (Narmadapuram)"]
 }
 
 @router.post("/crime")

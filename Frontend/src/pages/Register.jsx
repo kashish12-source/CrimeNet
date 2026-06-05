@@ -11,7 +11,7 @@ const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    role: "",
+    role: "citizen",
     address: "",
     phone_number: ""
 });
@@ -168,39 +168,7 @@ return (
                     required
                 />
 
-                <select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                    className="
-                        w-full
-                        border
-                        border-gray-300
-                        bg-white
-                        dark:bg-slate-900
-                        dark:text-slate-100
-                        dark:border-slate-600
-                        p-3
-                        rounded-lg
-                    "
-                    required
-                >
-                    <option value="">
-                        Select Role
-                    </option>
 
-                    <option value="citizen">
-                        Citizen
-                    </option>
-
-                    <option value="officer">
-                        Officer
-                    </option>
-
-                    <option value="admin">
-                        Admin
-                    </option>
-                </select>
 
                 <input
                     type="text"

@@ -7,7 +7,7 @@ import shutil
 from app.utils.notifications import create_notification
 from app.utils.logger import activity_logs
 
-from app.database.connection import SessionLocal
+from app.database.connection import SessionLocal, get_db
 
 from app.models.crime_model import Crime
 from app.models.user_model import User
@@ -27,15 +27,6 @@ router = APIRouter(
 prefix="/crime",
 tags=["Crime"]
 )
-
-def get_db():
-    db = SessionLocal()
-
-    try:
-        yield db
-
-    finally:
-        db.close()
 
 
 # =========================================
@@ -163,6 +154,31 @@ def create_crime(
 
     db.commit()
     db.refresh(new_crime)
+
+    # Trigger n8n Webhook
+    import os
+    import threading
+    n8n_webhook_url = os.getenv("N8N_WEBHOOK_URL")
+    if n8n_webhook_url:
+        def trigger_webhook():
+            try:
+                import requests
+                payload = {
+                    "crime_id": new_crime.id,
+                    "title": new_crime.title,
+                    "description": new_crime.description,
+                    "location": new_crime.location,
+                    "latitude": new_crime.latitude,
+                    "longitude": new_crime.longitude,
+                    "zone": new_crime.zone,
+                    "reported_by": current_user.username,
+                    "status": new_crime.status
+                }
+                requests.post(n8n_webhook_url, json=payload, timeout=5)
+            except Exception as e:
+                print(f"Error triggering n8n webhook: {e}")
+        
+        threading.Thread(target=trigger_webhook, daemon=True).start()
 
     return new_crime
 @router.put("/assign/{crime_id}")

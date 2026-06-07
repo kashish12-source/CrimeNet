@@ -3,7 +3,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.utils.logger import activity_logs
 
-from app.database.base import get_db
 from app.models.officer_model import Officer
 # from app.schemas.officer_schema import OfficerCreate,OfficerResponse
 from app.auth.oauth2 import get_current_user
@@ -13,21 +12,13 @@ from app.auth.jwt_handler import create_access_token
 from app.models.crime_model import Crime
 from app.schemas.crime_schema import UpdateStatus
 
-from app.database.connection import SessionLocal
+from app.database.connection import SessionLocal, get_db
 from app.models.notification_model import Notification
 
 router=APIRouter(
     prefix="/officers",
     tags=["Officers"]
 )
-
-# database  dependency
-def get_db():
-    db=SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 def officer_required(
         current_user:User=Depends(get_current_user)

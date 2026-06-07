@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import {SunIcon,MoonIcon} from "@heroicons/react/24/outline";
-import{useTheme} from "../context/ThemeContext";
+import {SunIcon, MoonIcon, ArrowRightOnRectangleIcon, ServerStackIcon} from "@heroicons/react/24/outline";
+import {useTheme} from "../context/ThemeContext";
 
 function Navbar() {
 
@@ -48,12 +48,9 @@ function Navbar() {
 
         <div className="flex items-center gap-4">
 
-            {/* Theme Button */}
-
             <button
-                onClick={() =>
-                    setDarkMode(!darkMode)
-                }
+                onClick={() => setDarkMode(!darkMode)}
+                title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                 className="
                     p-2
                     rounded-lg
@@ -63,30 +60,32 @@ function Navbar() {
                     transition
                 "
             >
-                {
-                    darkMode
-                    ?
-                    (
-                        <SunIcon
-                            className="
-                                h-5
-                                w-5
-                                text-yellow-400
-                            "
-                        />
-                    )
-                    :
-                    (
-                        <MoonIcon
-                            className="
-                                h-5
-                                w-5
-                                text-slate-900
-                            "
-                        />
-                    )
-                }
+                {darkMode ? (
+                    <SunIcon className="h-5 w-5 text-yellow-400" />
+                ) : (
+                    <MoonIcon className="h-5 w-5 text-slate-900" />
+                )}
             </button>
+
+            {/* Admin Blockchain Audit Button */}
+            {user?.role === "admin" && (
+                <button
+                    onClick={() => navigate("/blockchain-audit")}
+                    title="Blockchain Security Ledger Audit"
+                    className="
+                        p-2
+                        rounded-lg
+                        bg-indigo-100
+                        dark:bg-indigo-900/50
+                        hover:scale-105
+                        transition
+                        text-indigo-600
+                        dark:text-indigo-400
+                    "
+                >
+                    <ServerStackIcon className="h-5 w-5" />
+                </button>
+            )}
 
             <div className="text-right">
 
@@ -114,16 +113,22 @@ function Navbar() {
 
             <button
                 onClick={handleLogout}
+                title="Logout from CrimeNet"
                 className="
-                    bg-black
+                    flex
+                    items-center
+                    gap-2
+                    bg-rose-500
                     text-white
                     px-4
                     py-2
                     rounded-lg
-                    hover:bg-gray-800
+                    hover:bg-rose-600
+                    transition
                 "
             >
-                Logout
+                <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                <span className="hidden sm:inline font-semibold">Logout</span>
             </button>
 
         </div>

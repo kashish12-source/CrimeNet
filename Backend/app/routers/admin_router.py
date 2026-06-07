@@ -6,7 +6,7 @@ from fastapi import (
 
 from sqlalchemy.orm import Session
 
-from app.database.connection import SessionLocal
+from app.database.connection import SessionLocal, get_db
 from app.auth.oauth2 import get_current_user
 from app.models.user_model import User
 from app.models.crime_model import Crime
@@ -22,14 +22,6 @@ router = APIRouter(
     prefix="/admin",
     tags=["Admin"]
 )
-
-# DATABASE
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 # ADMIN CHECK
@@ -131,7 +123,7 @@ def assign_officer(
             status_code=404,
             detail="Crime not found"
         )
-    if not crime.assigned_officer_id is not None:
+    if crime.assigned_officer_id is not None:
         raise HTTPException(
             status_code=400,
             detail="Officer already assigned to this crime"

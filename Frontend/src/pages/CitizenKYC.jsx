@@ -23,10 +23,26 @@ export default function CitizenKYC() {
   const [loading, setLoading] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
   const [verificationLogs, setVerificationLogs] = useState([]);
+  
+  // State for our 10-minute (600 seconds) countdown timer
+  const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  // Timer logic: runs every second if an OTP has been sent and countdown > 0
+  useEffect(() => {
+    let timer;
+    if (isOtpSent && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      clearInterval(timer);
+    }
+    return () => clearInterval(timer);
+  }, [isOtpSent, countdown]);
 
   const fetchProfile = async () => {
     try {
@@ -102,6 +118,7 @@ export default function CitizenKYC() {
       
       const response = await API.post("/auth/citizen/send-otp", formData);
       setIsOtpSent(true);
+      setCountdown(600); // Start the 10-minute countdown
       setOtpResponse(response.data.otp_code || "");
       alert(`OTP sent! (For simulation/testing, the code is: ${response.data.otp_code})`);
     } catch (error) {
@@ -310,28 +327,40 @@ export default function CitizenKYC() {
                   {isOtpSent && (
                     <form onSubmit={handleVerifyOtp} className="space-y-4 pt-4 border-t border-dashed border-slate-200 dark:border-slate-600">
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                          Enter 6-Digit OTP Code
-                        </label>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Enter 6-Digit OTP Code
+                          </label>
+                          <span className={`text-xs font-bold font-mono px-2 py-1 rounded ${countdown > 0 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"}`}>
+                            {Math.floor(countdown / 60).toString().padStart(2, '0')}:{(countdown % 60).toString().padStart(2, '0')}
+                          </span>
+                        </div>
                         <input
                           type="text"
                           maxLength={6}
                           value={otpCode}
                           onChange={(e) => setOtpCode(e.target.value)}
                           placeholder="000000"
-                          className="w-full text-center tracking-widest font-mono text-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 dark:text-white p-2.5 rounded-lg"
+                          disabled={countdown === 0}
+                          className="w-full text-center tracking-widest font-mono text-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 dark:text-white p-2.5 rounded-lg disabled:opacity-50"
                           required
                         />
                       </div>
                       
-                      <div className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-950/20 p-2.5 rounded-lg">
-                        Simulated SMS Code: <span className="font-bold font-mono">{otpResponse}</span>
-                      </div>
+                      {countdown === 0 ? (
+                        <div className="text-xs text-rose-600 bg-rose-50 dark:bg-rose-950/20 p-2.5 rounded-lg font-semibold">
+                          OTP has expired. Please send a new OTP.
+                        </div>
+                      ) : (
+                        <div className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-950/20 p-2.5 rounded-lg">
+                          Simulated SMS Code: <span className="font-bold font-mono">{otpResponse}</span>
+                        </div>
+                      )}
 
                       <button
                         type="submit"
-                        disabled={otpLoading}
-                        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition"
+                        disabled={otpLoading || countdown === 0}
+                        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition disabled:opacity-50"
                       >
                         Confirm Verification Code
                       </button>

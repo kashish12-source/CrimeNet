@@ -1,0 +1,220 @@
+{
+  "name": "CrimeNet Automated Dispatch & Response Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "crimenet-webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "97e68cf1-97cf-4a30-8809-ff110dd560cb",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.description ? $json.description.toLowerCase() : '' }}",
+              "operation": "regex",
+              "value2": "murder|kill|robbery|kidnap|theft|weapon|assault|gun|knife"
+            }
+          ]
+        }
+      },
+      "id": "e98e25d2-a7ab-433b-ab1e-7b7952a225de",
+      "name": "Check Priority",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        420,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://httpbin.org/post",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"alert\": \"URGENT: High priority crime reported!\",\n  \"crime_id\": \"={{ $json.crime_id }}\",\n  \"title\": \"={{ $json.title }}\",\n  \"location\": \"={{ $json.location }}\",\n  \"zone\": \"={{ $json.zone }}\"\n}",
+        "options": {}
+      },
+      "id": "d04112e4-e0b0-40e1-b48e-f5c7ef6d62a3",
+      "name": "Log & Notify Urgent Crime",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        640,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8000/auth/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"email\": \"admin@crimenet.gov\",\n  \"password\": \"adminpassword\"\n}",
+        "options": {}
+      },
+      "id": "010be280-9289-4d64-b890-ffbfae8b15d2",
+      "name": "Admin Login",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        860,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/admin/officers",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "27cfb62e-ffb9-43c3-9828-98e6cd28362a",
+      "name": "Get Officers List",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1080,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const officers = $input.all();\nconst webhookNode = $('Webhook');\nconst crimeZone = webhookNode.first().json.zone;\nconst crimeId = webhookNode.first().json.crime_id;\n\nconst matched = officers.find(o => o.json.assigned_area === crimeZone);\n\nif (matched) {\n  return [{\n    json: {\n      officer_id: matched.json.id,\n      officer_username: matched.json.username,\n      crime_id: crimeId,\n      zone: crimeZone,\n      matched: true\n    }\n  }];\n} else {\n  const fallback = officers.length > 0 ? officers[0] : null;\n  return [{\n    json: {\n      officer_id: fallback ? fallback.json.id : null,\n      officer_username: fallback ? fallback.json.username : \"No Officer Available\",\n      crime_id: crimeId,\n      zone: crimeZone,\n      matched: false,\n      warning: \"No officer assigned to this zone.\"\n    }\n  }];\n}"
+      },
+      "id": "f290562e-33b8-4680-a611-37cd1fbb891e",
+      "name": "Match Officer by Zone",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:8000/admin/assign-officer/{{ $json.crime_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Admin Login').first().json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"officer_id\": {{ $json.officer_id }}\n}",
+        "options": {}
+      },
+      "id": "a90dfa19-74d1-4340-9a2c-d9c02ff4b245",
+      "name": "Auto-Assign Officer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1520,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Priority": {
+      "main": [
+        [
+          {
+            "node": "Log & Notify Urgent Crime",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Admin Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log & Notify Urgent Crime": {
+      "main": [
+        [
+          {
+            "node": "Admin Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Admin Login": {
+      "main": [
+        [
+          {
+            "node": "Get Officers List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Officers List": {
+      "main": [
+        [
+          {
+            "node": "Match Officer by Zone",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Officer by Zone": {
+      "main": [
+        [
+          {
+            "node": "Auto-Assign Officer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": true
+}

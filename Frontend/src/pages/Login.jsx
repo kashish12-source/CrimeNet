@@ -8,21 +8,23 @@ function Login() {
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
-
     const [password, setPassword] = useState("");
+    const [role, setRole] = useState("citizen");
 
     const loginUser = async (e) => {
-
         e.preventDefault();
-
         try {
-
             const formData = {
                 email,
                 password
             };
 
             const response = await loginService(formData);
+
+            if (response.data.user.role !== role) {
+                alert(`Login failed: Account is registered as '${response.data.user.role}', but you selected '${role}'.`);
+                return;
+            }
 
             localStorage.setItem(
                 "token",
@@ -90,6 +92,30 @@ function Login() {
                 ">
                     Login to continue
                 </p>
+                <div className="mb-5">
+                    <select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="
+                            w-full
+                            border
+                            border-gray-300
+                            bg-white
+                            dark:bg-slate-900
+                            dark:text-slate-100
+                            p-3
+                            rounded-lg
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-black
+                        "
+                        required
+                    >
+                        <option value="citizen">Citizen</option>
+                        <option value="officer">Officer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
 
                 <div className="mb-5">
 

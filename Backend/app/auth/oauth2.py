@@ -3,20 +3,11 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from app.database.base import SessionLocal
+from app.database.connection import get_db
 from app.models.user_model import User
 from app.auth.jwt_handler import SECRET_KEY,ALGORITHM
 
 oauth2_scheme=OAuth2PasswordBearer(tokenUrl="/auth/login")
-
-# Database dependency
-
-def get_db():
-    db=SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # verify token and get current user
 def get_current_user(

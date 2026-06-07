@@ -28,7 +28,40 @@ function AdminAssignCrime() {
             let score = 0;
             let recommendationLabel = "";
             
-            const isSpecialtyMatch = officer.specialization === crime.title;
+            // Robust keyword-based specialty matching
+            let isSpecialtyMatch = false;
+            if (officer.specialization && (crime.title || crime.description)) {
+                const specLower = officer.specialization.toLowerCase();
+                const titleLower = (crime.title || "").toLowerCase();
+                const descLower = (crime.description || "").toLowerCase();
+                
+                // Direct containment
+                if (titleLower.includes(specLower) || descLower.includes(specLower)) {
+                    isSpecialtyMatch = true;
+                } else {
+                    // Keyword map for specialties to match loose phrasing
+                    const keywordMap = {
+                        "cyber crime": ["cyber", "hack", "phishing", "online", "internet", "email", "whatsapp", "facebook", "instagram", "account", "digital", "ransomware", "virus"],
+                        "theft": ["theft", "steal", "rob", "burglar", "break-in", "stolen", "pocket", "shoplift", "loot"],
+                        "vandalism": ["vandal", "graffiti", "damage", "destroy", "wreck", "trash", "deface"],
+                        "fraud": ["fraud", "scam", "cheat", "fake", "forge", "impersonat", "card", "money", "transaction", "bank"],
+                        "assault": ["assault", "beat", "fight", "attack", "hit", "violence", "punch", "slap", "threaten", "harass"],
+                        "arson": ["arson", "fire", "burn", "flame", "smoke", "blaze"],
+                        "drug trafficking": ["drug", "smuggle", "cocaine", "heroin", "marijuana", "weed", "narcotic", "dealer", "contraband"],
+                        "traffic incident": ["traffic", "accident", "crash", "car", "vehicle", "collision", "speeding", "hit and run", "road"]
+                    };
+                    
+                    for (const [key, keywords] of Object.entries(keywordMap)) {
+                        if (specLower.includes(key) || key.includes(specLower)) {
+                            if (keywords.some(kw => titleLower.includes(kw) || descLower.includes(kw))) {
+                                isSpecialtyMatch = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
             const isZoneMatch = officer.assigned_area === crime.zone;
             
             let isAdjacent = false;

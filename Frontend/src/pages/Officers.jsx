@@ -29,6 +29,33 @@ function Officers() {
     assigned_area: "Central Zone (Bhopal)"
   });
   const [submitting, setSubmitting] = useState(false);
+  const [addressSuggestions, setAddressSuggestions] = useState([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  const handleAddressChange = async (e) => {
+    const value = e.target.value;
+    setFormData({
+      ...formData,
+      address: value
+    });
+
+    if (value.trim().length < 3) {
+      setAddressSuggestions([]);
+      return;
+    }
+
+    setLoadingSuggestions(true);
+    try {
+      // Fetch suggestions through our backend proxy to bypass browser-side CORS issues
+      const response = await API.get(`/auth/address-suggestions?q=${encodeURIComponent(value)}`);
+      setAddressSuggestions(response.data || []);
+    } catch (error) {
+      console.error("Error fetching address suggestions:", error);
+      setAddressSuggestions([]);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -184,7 +211,7 @@ function Officers() {
                   </div>
                 </div>
 
-                <div>
+                <div className="relative">
                   <label className="block text-xs font-semibold text-slate-400 uppercase mb-1.5">
                     Office / Station Address
                   </label>
@@ -194,12 +221,36 @@ function Officers() {
                       type="text"
                       name="address"
                       value={formData.address}
-                      onChange={handleInputChange}
+                      onChange={handleAddressChange}
                       placeholder="e.g. Police Line, Bhopal"
                       className="w-full pl-9 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 dark:text-white p-2.5 rounded-lg text-sm"
                       required
+                      autoComplete="off"
                     />
+                    {loadingSuggestions && (
+                      <span className="absolute right-3 top-3.5 text-xs text-slate-400">Loading...</span>
+                    )}
                   </div>
+                  
+                  {addressSuggestions.length > 0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {addressSuggestions.map((suggestion, index) => (
+                        <div
+                          key={index}
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              address: suggestion.display_name
+                            });
+                            setAddressSuggestions([]);
+                          }}
+                          className="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-sm text-slate-700 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                        >
+                          {suggestion.display_name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
